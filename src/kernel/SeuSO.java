@@ -1,4 +1,5 @@
 package kernel;
+import java.time.LocalTime;
 import java.util.List;
 
 import operacoes.Operacao;
@@ -7,6 +8,18 @@ import operacoes.OperacaoES;
 public class SeuSO extends SO {
 
 	private Escalonador escalonador;
+	private int quantidadeDeProcessos;
+	private Long tempoEsperaTotal; //Valor em ms
+	private Long tempoRespostaTotal; // Valor em ms
+	private Long tempoRetornoTotal; // valor em ms
+
+	public SeuSO() {
+		this.escalonador = null;
+		this.quantidadeDeProcessos = 0;
+		this.tempoEsperaTotal = 0L;
+		this.tempoRespostaTotal = 0L;
+		this.tempoRetornoTotal = 0L;
+	}
 
 	@Override
 	// ATENCÃO: cria o processo mas o mesmo 
