@@ -4,12 +4,20 @@ import operacoes.Operacao;
 
 public class PCB_SRTF extends PCB{
 
+    long processosFaltantes;
+
     public PCB_SRTF(Operacao[] codigo) {
         super(codigo);
     }
 
     @Override
     public int compareTo(Object o) {
-        return 0;
+        if(! (o instanceof PCB_SRTF))
+            throw new RuntimeException("Objeto de comparação não é PCB SRTF");
+        if(processosFaltantes < ((PCB_SRTF) o).processosFaltantes)
+            return -1;
+        if(processosFaltantes > ((PCB_SRTF) o).processosFaltantes)
+            return +1;
+        return Integer.compare(this.idProcesso, ((PCB_SRTF) o).idProcesso);
     }
 }

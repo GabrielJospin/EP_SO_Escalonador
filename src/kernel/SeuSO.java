@@ -8,7 +8,9 @@ import operacoes.OperacaoES;
 
 public class SeuSO extends SO {
 
+	//Escalonador
 	private Escalonador escalonador;
+	List<PCB> processos;
 
 	//Variaveis de Tempo
 	private int quantidadeDeProcessos;
@@ -29,6 +31,7 @@ public class SeuSO extends SO {
 
 	public SeuSO() {
 		this.escalonador = null;
+		this.processos = new ArrayList<>();
 
 		this.quantidadeDeProcessos = 0;
 		this.tempoEsperaTotal = 0L;
@@ -48,7 +51,7 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		// TODO Auto-generated method stub
+
 	}
 
 	@Override
