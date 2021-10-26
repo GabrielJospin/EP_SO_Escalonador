@@ -91,20 +91,26 @@ public class SeuSO extends SO {
 
 	@Override
 	protected int tempoEsperaMedio() {
-		// TODO Auto-generated method stub
-		return 0;
+		if(quantidadeDeProcessos == 0)
+			return -1;
+
+		return (int) (tempoEsperaTotal/quantidadeDeProcessos);
 	}
 
 	@Override
 	protected int tempoRespostaMedio() {
-		// TODO Auto-generated method stub
-		return 0;
+		if(quantidadeDeProcessos == 0)
+			return -1;
+
+		return (int) (tempoRespostaTotal/quantidadeDeProcessos);
 	}
 
 	@Override
 	protected int tempoRetornoMedio() {
-		// TODO Auto-generated method stub
-		return 0;
+		if(quantidadeDeProcessos == 0)
+			return -1;
+
+		return (int) (tempoRetornoTotal/quantidadeDeProcessos);
 	}
 
 	@Override
