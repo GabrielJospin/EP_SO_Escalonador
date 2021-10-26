@@ -1,8 +1,10 @@
 package kernel.PCB;
 import operacoes.Operacao;
 
+import java.util.Comparator;
+
 //Freire comunista confirmado
-public abstract class PCB implements Comparable {
+public abstract class PCB implements Comparator<PCB> {
 
 
 	public enum Estado {NOVO, PRONTO, EXECUTANDO, ESPERANDO, TERMINADO}
@@ -23,7 +25,7 @@ public abstract class PCB implements Comparable {
 	}
 
 	@Override
-	public abstract int compareTo(Object o);
+	public abstract int compare(PCB o1, PCB o2);
 /*
 
 	O COMPARE TO

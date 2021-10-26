@@ -11,14 +11,12 @@ public class PCB_SRTF extends PCB{
         this.processosFaltantes = codigo.length;
     }
 
+
     @Override
-    public static int compareTo(Object o) {
-        if(! (o instanceof PCB_SRTF))
-            throw new RuntimeException("Objeto de comparação não é PCB SRTF");
-        if(processosFaltantes < ((PCB_SRTF) o).processosFaltantes)
-            return -1;
-        if(processosFaltantes > ((PCB_SRTF) o).processosFaltantes)
-            return +1;
-        return Integer.compare(this.idProcesso, ((PCB_SRTF) o).idProcesso);
+    public int compare(PCB o1, PCB o2) {
+        if(!(o1 instanceof PCB_SRTF) || !(o2 instanceof PCB_SRTF) )
+            throw new RuntimeException("Objetos não comparaveis");
+
+        return (int) (((PCB_SRTF) o1).processosFaltantes - ((PCB_SRTF) o2).processosFaltantes);
     }
 }

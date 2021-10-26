@@ -1,7 +1,5 @@
 package kernel;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import kernel.PCB.PCB;
 import kernel.PCB.PCB_SRTF;
@@ -60,9 +58,8 @@ public class SeuSO extends SO {
 
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
-		Comparator<PCB> comparator = Comparator.comparing(PCB_SRTF::compareTo);
 		processos.add(processo);
-		processos.sort(comparator);
+		Collections.sort(processos, new PCB_SRTF(codigo));
 	}
 
 	@Override
