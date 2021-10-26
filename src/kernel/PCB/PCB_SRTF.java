@@ -12,7 +12,7 @@ public class PCB_SRTF extends PCB{
     }
 
     @Override
-    public int compareTo(Object o) {
+    public static int compareTo(Object o) {
         if(! (o instanceof PCB_SRTF))
             throw new RuntimeException("Objeto de comparação não é PCB SRTF");
         if(processosFaltantes < ((PCB_SRTF) o).processosFaltantes)

@@ -1,4 +1,5 @@
 package kernel;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,7 +53,12 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-
+		if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)){
+			PCB_SRTF processo = new PCB_SRTF(codigo);
+			Comparator<PCB> comparator = Comparator.comparing(PCB_SRTF::compareTo);
+			processos.add(processo);
+			processos.sort(comparator);
+		}
 	}
 
 	@Override
