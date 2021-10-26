@@ -1,11 +1,11 @@
-package kernel;
+package kernel.PCB;
 import operacoes.Operacao;
 
 //Freire comunista confirmado
-public class PCB implements Comparable {
+public abstract class PCB implements Comparable {
 
 
-	public enum Estado {NOVO, PRONTO, EXECUTANDO, ESPERANDO, TERMINADO};
+	public enum Estado {NOVO, PRONTO, EXECUTANDO, ESPERANDO, TERMINADO}
 	public int idProcesso; // primeiro processo criado deve ter id = 0
 	public Estado estado;
 	public int[] registradores;
@@ -23,21 +23,7 @@ public class PCB implements Comparable {
 	}
 
 	@Override
-	public int compareTo(Object o) {
-		if(!(o instanceof PCB))
-			return 0;
-
-		if(this.proximoChute < ((PCB) o).proximoChute)
-			return -1;
-		else if(this.proximoChute > ((PCB) o).proximoChute)
-			return 1;
-		else
-		if (this.idProcesso < ((PCB) o).idProcesso)
-			return -1;
-		else
-			return 1;
-	}
-
+	public abstract int compareTo(Object o);
 
 
 

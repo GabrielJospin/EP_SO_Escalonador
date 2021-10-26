@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import kernel.PCB.PCB;
 import operacoes.Carrega;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
