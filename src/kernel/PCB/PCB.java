@@ -34,28 +34,21 @@ public abstract class PCB implements Comparator<PCB> {
 	 Vc vai criar uma nova classe PCB_{Escalonador}
 	 Ai nele vc deve adicionar um "Extends PCB" na classe
 	 criar um contrutor com super();
-	 e criar um método chamado compareTo(Object o)
+	 e criar um método chamado compare(Object o)
 	 nele vc vai ter o seguinte esquema
 	 	-> Testar se for do tipo PCB
 	 		-> se não for, gera um erro
 	 		-> Se for:
-	 			-> Caso seja mais prioritário o objeto O, ou seja vem antes no array, retorna -1;
-	 			-> Caso seja menos prioritario, ou seja, venha dps. retorna +1;
-	 			-> Caso empate 0, mas isso não deve ocorre no nosso caso
+	 			-> Retorna valor 1 menos valor 2
 
 	 Exemplo simples de compareTo()
 
-	 public int compareTo(Object o){
+	 public int compareTo(Object o1, Object o2){
 	 	if(! o instance of Integer){
 	 		throw new RuntimeException("Objeto inválido");
 	 	}
+	 		return o1.valor - o2.valor;
 
-	 	if( o.valor < this.valor)
-	 		return -1;
-		if( o.valor > this.valor)
-			return 1;
-	 	else // o.valor == this.valor
-	 		return 0;
 	 }
 
 */
