@@ -1,8 +1,9 @@
 package kernel;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import kernel.PCB.PCB;
+import kernel.PCB.PCB_SRTF;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
 
@@ -31,7 +32,7 @@ public class SeuSO extends SO {
 
 	public SeuSO() {
 		this.escalonador = null;
-		this.processos = new ArrayList<>();
+		this.processos = new LinkedList<>();
 
 		this.quantidadeDeProcessos = 0;
 		this.tempoEsperaTotal = 0L;
@@ -39,10 +40,10 @@ public class SeuSO extends SO {
 		this.tempoRetornoTotal = 0L;
 		this.trocasDeProcesso = 0;
 
-		this.processosTerminados = new ArrayList<>();
-		this.processosPausados  = new ArrayList<>();
-		this.processosEmEspera = new ArrayList<>();
-		this.processosProntos = new ArrayList<>();
+		this.processosTerminados = new LinkedList<>();
+		this.processosPausados  = new LinkedList<>();
+		this.processosEmEspera = new LinkedList<>();
+		this.processosProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
 	}
 
@@ -51,7 +52,7 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		
+
 	}
 
 	@Override
@@ -84,21 +85,25 @@ public class SeuSO extends SO {
 
 	@Override
 	protected Integer idProcessoNovo() {
+		gerateLists();
 		return idProcessoNovo;
 	}
 
 	@Override
 	protected List<Integer> idProcessosProntos() {
+		gerateLists();
 		return this.processosProntos;
 	}
 
 	@Override
 	protected Integer idProcessoExecutando() {
+		gerateLists();
 		return this.idProcessoAtual;
 	}
 
 	@Override
 	protected List<Integer> idProcessosEsperando() {
+		gerateLists();
 		return this.processosEmEspera;
 	}
 
@@ -142,6 +147,17 @@ public class SeuSO extends SO {
 	}
 
 	private void gerateLists(){
-
+		processos.forEach(e ->{
+			if(e.estado.equals(PCB.Estado.NOVO))
+				idProcessoNovo = e.idProcesso;
+			if(e.estado.equals(PCB.Estado.PRONTO))
+				processosProntos.add(e.idProcesso);
+			if(e.estado.equals(PCB.Estado.EXECUTANDO))
+				idProcessoAtual = e.idProcesso;
+			if(e.estado.equals(PCB.Estado.ESPERANDO))
+				processosEmEspera.add(e.idProcesso);
+			if(e.estado.equals(PCB.Estado.TERMINADO))
+				processosTerminados.add(e.idProcesso);
+		});
 	}
 }
