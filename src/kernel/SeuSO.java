@@ -51,7 +51,7 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-
+		
 	}
 
 	@Override

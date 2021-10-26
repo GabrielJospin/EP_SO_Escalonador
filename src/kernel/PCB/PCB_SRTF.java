@@ -8,6 +8,7 @@ public class PCB_SRTF extends PCB{
 
     public PCB_SRTF(Operacao[] codigo) {
         super(codigo);
+        this.processosFaltantes = codigo.length;
     }
 
     @Override
