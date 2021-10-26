@@ -1,5 +1,6 @@
 package kernel;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import operacoes.Operacao;
@@ -8,17 +9,38 @@ import operacoes.OperacaoES;
 public class SeuSO extends SO {
 
 	private Escalonador escalonador;
+
+	//Variaveis de Tempo
 	private int quantidadeDeProcessos;
 	private Long tempoEsperaTotal; //Valor em ms
 	private Long tempoRespostaTotal; // Valor em ms
 	private Long tempoRetornoTotal; // valor em ms
+	private int trocasDeProcesso;
+
+	//Variaveis de Organização
+	List<Integer> processosTerminados;
+	List<Integer> processosPausados;
+	List<Integer> processosEmEspera;
+	List<Integer> processosProntos;
+	int idProcessoAtual;
+	int idProcessoNovo;
+
+
 
 	public SeuSO() {
 		this.escalonador = null;
+
 		this.quantidadeDeProcessos = 0;
 		this.tempoEsperaTotal = 0L;
 		this.tempoRespostaTotal = 0L;
 		this.tempoRetornoTotal = 0L;
+		this.trocasDeProcesso = 0;
+
+		this.processosTerminados = new ArrayList<>();
+		this.processosPausados  = new ArrayList<>();
+		this.processosEmEspera = new ArrayList<>();
+		this.processosProntos = new ArrayList<>();
+		this.idProcessoAtual = -1;
 	}
 
 	@Override
@@ -26,7 +48,6 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		PCB pcbAtual = new PCB(codigo);
 		// TODO Auto-generated method stub
 	}
 
@@ -55,38 +76,32 @@ public class SeuSO extends SO {
 
 	@Override
 	protected boolean temTarefasPendentes() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.processosEmEspera.isEmpty();
 	}
 
 	@Override
 	protected Integer idProcessoNovo() {
-		// TODO Auto-generated method stub
-		return null;
+		return idProcessoNovo;
 	}
 
 	@Override
 	protected List<Integer> idProcessosProntos() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.processosProntos;
 	}
 
 	@Override
 	protected Integer idProcessoExecutando() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.idProcessoAtual;
 	}
 
 	@Override
 	protected List<Integer> idProcessosEsperando() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.processosEmEspera;
 	}
 
 	@Override
 	protected List<Integer> idProcessosTerminados() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.processosTerminados;
 	}
 
 	@Override
@@ -115,12 +130,15 @@ public class SeuSO extends SO {
 
 	@Override
 	protected int trocasContexto() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.trocasDeProcesso;
 	}
 
 	@Override
 	public void defineEscalonador(Escalonador e) {
 		this.escalonador = e;
+	}
+
+	private void gerateLists(){
+
 	}
 }
