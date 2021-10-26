@@ -11,6 +11,7 @@ public class SeuSO extends SO {
 	@Override
 	// ATENCÃO: cria o processo mas o mesmo 
 	// só estará "pronto" no proxime ciclo
+    //Teste
 	protected void criaProcesso(Operacao[] codigo) {
 		PCB pcbAtual = new PCB(codigo);
 		// TODO Auto-generated method stub
