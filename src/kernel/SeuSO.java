@@ -54,11 +54,15 @@ public class SeuSO extends SO {
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
 		if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)){
-			PCB_SRTF processo = new PCB_SRTF(codigo);
-			Comparator<PCB> comparator = Comparator.comparing(PCB_SRTF::compareTo);
-			processos.add(processo);
-			processos.sort(comparator);
+			criaProcessoSRTF(codigo);
 		}
+	}
+
+	private void criaProcessoSRTF(Operacao[] codigo){
+		PCB_SRTF processo = new PCB_SRTF(codigo);
+		Comparator<PCB> comparator = Comparator.comparing(PCB_SRTF::compareTo);
+		processos.add(processo);
+		processos.sort(comparator);
 	}
 
 	@Override
