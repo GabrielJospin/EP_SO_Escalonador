@@ -1,6 +1,7 @@
 package kernel;
 import operacoes.Operacao;
 
+//Freire comunista confirmado
 public class PCB implements Comparable {
 
 
@@ -24,7 +25,7 @@ public class PCB implements Comparable {
 	@Override
 	public int compareTo(Object o) {
 		if(!(o instanceof PCB))
-			return 404;
+			return 0;
 
 		if(this.proximoChute < ((PCB) o).proximoChute)
 			return -1;
