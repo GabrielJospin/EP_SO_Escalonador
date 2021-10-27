@@ -17,6 +17,8 @@ public class PCB_SRTF extends PCB{
         if(!(o1 instanceof PCB_SRTF) || !(o2 instanceof PCB_SRTF) )
             throw new RuntimeException("Objetos não comparaveis");
 
-        return (int) (((PCB_SRTF) o1).processosFaltantes - ((PCB_SRTF) o2).processosFaltantes);
+        int answer = (int) (((PCB_SRTF) o1).processosFaltantes - ((PCB_SRTF) o2).processosFaltantes);
+
+        return answer != 0 ? answer : o1.idProcesso - o2.idProcesso;
     }
 }
