@@ -111,6 +111,7 @@ public class SeuSO extends SO {
 
 			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
 			executaOperacao(operacaoAtual, PCBatual);
+			PCBatual.operacoesFeitas++;
 		}
 	}
 
