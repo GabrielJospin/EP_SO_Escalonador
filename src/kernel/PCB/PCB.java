@@ -14,14 +14,18 @@ public abstract class PCB implements Comparator<PCB> {
 	public int contadorDePrograma;
 	public Operacao[] codigo;
 	public int proximoChute;
+	public static int processosfeitos = 0;
+	public int operacoesFeitas;
 
 	public PCB( Operacao[] codigo) {
-		this.idProcesso = 0;
+		this.idProcesso = processosfeitos;
 		this.estado = Estado.NOVO;
 		this.registradores = new int[5];
 		this.contadorDePrograma = 0;
 		this.codigo = codigo;
 		this.proximoChute = 5;
+		this.operacoesFeitas = 0;
+		processosfeitos++;
 	}
 
 	@Override

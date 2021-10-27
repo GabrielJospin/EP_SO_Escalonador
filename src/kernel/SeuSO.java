@@ -3,8 +3,10 @@ import java.util.*;
 
 import kernel.PCB.PCB;
 import kernel.PCB.PCB_SRTF;
+import operacoes.Carrega;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
+import operacoes.Soma;
 
 public class SeuSO extends SO {
 
@@ -51,13 +53,14 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)){
+		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			criaProcessoSRTF(codigo);
 		}
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
+		processo.estado = PCB.Estado.ESPERANDO;
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
@@ -82,7 +85,33 @@ public class SeuSO extends SO {
 
 	@Override
 	protected void executaCicloKernel() {
-		// TODO Auto-generated method stub
+		PCB PCBatual = getPCBAtual();
+
+		gerateLists();
+		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
+			if(idProcessoAtual != processos.get(0).idProcesso){
+
+				if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
+					PCBatual.estado = PCB.Estado.TERMINADO;
+				else
+					PCBatual.estado = PCB.Estado.ESPERANDO;
+
+				PCB PCBproximo = processos.get(0);
+				trocaContexto(PCBatual, PCBproximo);
+				return;
+			}
+
+			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
+				PCBatual.estado = PCB.Estado.PRONTO;
+				return;
+			}
+
+			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
+				PCBatual.estado = PCB.Estado.EXECUTANDO;
+
+			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
+			executaOperacao(operacaoAtual, PCBatual);
+		}
 	}
 
 	@Override
@@ -166,5 +195,39 @@ public class SeuSO extends SO {
 			if(e.estado.equals(PCB.Estado.TERMINADO))
 				processosTerminados.add(e.idProcesso);
 		});
+	}
+
+	private PCB getPCBAtual(){
+		for (PCB processo : processos)
+			if (processo.idProcesso == idProcessoAtual)
+				return processo;
+
+		throw new RuntimeException("PCb atual nulo");
+	}
+
+	private static void executaOperacao(Operacao operacao, PCB pcb){
+		if(operacao instanceof Soma)
+			excutaSoma((Soma) operacao, pcb);
+		if(operacao instanceof Carrega)
+			executaCarrega((Carrega) operacao, pcb);
+		if(operacao instanceof OperacaoES)
+			executaOperacaoES((OperacaoES) operacao, pcb);
+		else
+			throw new RuntimeException("Operador Inválido");
+	}
+
+	private static void executaOperacaoES(OperacaoES operacaoES, PCB pcb) {
+		//TODO Operação ES
+	}
+
+	private static void executaCarrega(Carrega carrega, PCB pcb) {
+		pcb.registradores[carrega.registrador] = carrega.valor;
+	}
+
+	private static void excutaSoma(Soma soma, PCB pcb) {
+		int parcela1 = pcb.registradores[soma.registradorParcela1];
+		int parcela2 = pcb.registradores[soma.registradorParcela2];
+		int result = parcela1 + parcela2;
+		pcb.registradores[soma.registradorTotal] = result;
 	}
 }
