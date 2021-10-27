@@ -39,7 +39,8 @@ public abstract class PCB implements Comparator<PCB> {
 	 	-> Testar se for do tipo PCB
 	 		-> se não for, gera um erro
 	 		-> Se for:
-	 			-> Retorna valor 1 menos valor 2
+	 			-> Retorna valor 1 menos valor 2 (Se o valor for 0,
+	 			usar critério de desempate de ordem de chegada)
 
 	 Exemplo simples de compareTo()
 

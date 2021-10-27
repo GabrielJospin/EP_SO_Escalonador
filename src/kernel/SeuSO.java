@@ -59,7 +59,7 @@ public class SeuSO extends SO {
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
 		processos.add(processo);
-		Collections.sort(processos, new PCB_SRTF(codigo));
+		Collections.sort(processos, processo);
 	}
 
 	@Override
