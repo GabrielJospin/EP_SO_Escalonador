@@ -60,14 +60,17 @@ public class SeuSO extends SO {
 
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
-		processo.estado = PCB.Estado.ESPERANDO;
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
 
 	@Override
 	protected void trocaContexto(PCB pcbAtual, PCB pcbProximo) {
-		// TODO Auto-generated method stub
+		int idPCBAtual = processos.indexOf(pcbAtual);
+		int idPCBProx = processos.indexOf(pcbAtual);
+		processos.get(idPCBAtual).estado = PCB.Estado.ESPERANDO;
+		processos.get(idPCBProx).estado = PCB.Estado.PRONTO;
+		gerateLists();
 	}
 
 	@Override
