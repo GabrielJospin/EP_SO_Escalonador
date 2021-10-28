@@ -2,6 +2,7 @@ package kernel;
 import java.util.*;
 
 import kernel.PCB.PCB;
+import kernel.PCB.PCB_RR;
 import kernel.PCB.PCB_SRTF;
 import operacoes.Carrega;
 import operacoes.Operacao;
@@ -55,7 +56,18 @@ public class SeuSO extends SO {
 	protected void criaProcesso(Operacao[] codigo) {
 		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			criaProcessoSRTF(codigo);
+			return;
 		}
+		if(escalonador.equals(Escalonador.ROUND_ROBIN_QUANTUM_5)){
+			criaProcessoRR(codigo);
+			return;
+		}
+	}
+
+	private void criaProcessoRR(Operacao[] codigo) {
+		PCB_RR processo = new PCB_RR(codigo);
+		processos.add(processo);
+		Collections.sort(processos, processo);
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
@@ -114,8 +126,11 @@ public class SeuSO extends SO {
 
 			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
 			executaOperacao(operacaoAtual, PCBatual);
+			//TODO Refatorar para usar metodos SO
 			PCBatual.operacoesFeitas++;
 		}
+
+		//TODO Ciclo Kernel RR
 	}
 
 	@Override
