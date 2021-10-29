@@ -30,6 +30,9 @@ public class SeuSO extends SO {
 
 
 	public SeuSO() {
+
+		PCB.processosfeitos = 0;
+
 		this.escalonador = null;
 		this.processos = new LinkedList<>();
 
@@ -261,7 +264,7 @@ public class SeuSO extends SO {
 			if (processo.idProcesso == idProcessoAtual)
 				return processo;
 
-		throw new RuntimeException("PCb atual nulo");
+		throw new RuntimeException("PCB nulo");
 	}
 
 }
