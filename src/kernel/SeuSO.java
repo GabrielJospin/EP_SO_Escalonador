@@ -45,7 +45,7 @@ public class SeuSO extends SO {
 		this.processosPausados  = new LinkedList<>();
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
-		this.idProcessoAtual = -1;
+		this.idProcessoAtual = 0;
 		this.indiceOperacao = -1;
 		}
 
@@ -116,9 +116,10 @@ public class SeuSO extends SO {
 	protected Operacao proximaOperacaoCPU() {
 		PCB PCBatual = getPCBAtual();
 		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
-			PCBatual.operacoesFeitas++;
 			processos.set(idProcessoAtual, PCBatual);
-			return PCBatual.codigo[PCBatual.operacoesFeitas];
+			Operacao answer = PCBatual.codigo[PCBatual.operacoesFeitas];
+			PCBatual.operacoesFeitas++;
+			return answer;
 		} 
 		else
 			return null;
