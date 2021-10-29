@@ -91,13 +91,16 @@ public class SeuSO extends SO {
 
 	@Override
 	protected Operacao proximaOperacaoCPU() {
-		// TODO Auto-generated method stub
 		PCB PCBatual = getPCBAtual();
 		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
+			PCBatual.operacoesFeitas++;
+			processos.set(idProcessoAtual, PCBatual);
 			return PCBatual.codigo[PCBatual.operacoesFeitas];
 		} 
 		else
 			return null;
+
+
 	}
 
 	@Override
