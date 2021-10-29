@@ -218,6 +218,7 @@ public class SeuSO extends SO {
 	}
 
 	private PCB getPCBAtual(){
+		gerateLists();
 		for (PCB processo : processos)
 			if (processo.idProcesso == idProcessoAtual)
 				return processo;
