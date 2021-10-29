@@ -225,29 +225,4 @@ public class SeuSO extends SO {
 		throw new RuntimeException("PCb atual nulo");
 	}
 
-	private static void executaOperacao(Operacao operacao, PCB pcb){
-		if(operacao instanceof Soma)
-			excutaSoma((Soma) operacao, pcb);
-		if(operacao instanceof Carrega)
-			executaCarrega((Carrega) operacao, pcb);
-		if(operacao instanceof OperacaoES)
-			executaOperacaoES((OperacaoES) operacao, pcb);
-		else
-			throw new RuntimeException("Operador Inválido");
-	}
-
-	private static void executaOperacaoES(OperacaoES operacaoES, PCB pcb) {
-		//TODO Operação ES
-	}
-
-	private static void executaCarrega(Carrega carrega, PCB pcb) {
-		pcb.registradores[carrega.registrador] = carrega.valor;
-	}
-
-	private static void excutaSoma(Soma soma, PCB pcb) {
-		int parcela1 = pcb.registradores[soma.registradorParcela1];
-		int parcela2 = pcb.registradores[soma.registradorParcela2];
-		int result = parcela1 + parcela2;
-		pcb.registradores[soma.registradorTotal] = result;
-	}
 }
