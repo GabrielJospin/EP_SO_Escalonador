@@ -114,7 +114,13 @@ public class SeuSO extends SO {
 				pcbAtual = processo;
 		}
 
-		return pcbAtual != null ? (OperacaoES) pcbAtual.codigo[pcbAtual.operacoesFeitas]: null;
+		if(pcbAtual == null)
+			return null;
+		Operacao answer =  pcbAtual.codigo[pcbAtual.operacoesFeitas];
+
+		return answer instanceof OperacaoES ?
+				(OperacaoES) answer:
+				null;
 	}
 
 	@Override
