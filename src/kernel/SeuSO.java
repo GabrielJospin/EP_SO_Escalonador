@@ -1,7 +1,7 @@
 package kernel;
 import java.util.*;
 
-import kernel.PCB.PCB;
+import kernel.PCB.PCB;\
 import kernel.PCB.PCB_SRTF;
 import operacoes.Carrega;
 import operacoes.Operacao;
@@ -30,6 +30,10 @@ public class SeuSO extends SO {
 	int idProcessoNovo;
 	int indiceOperacao;
 
+	//SJF
+	if(escalonador.SHORTEST_JOB_FIRST) {
+		public proxChuteBurstCPU = 5;
+	}
 
 	public SeuSO() {
 		this.escalonador = null;
@@ -46,7 +50,6 @@ public class SeuSO extends SO {
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
-		this.PCBAtual = null; //precisa inicializar em algum lugar. Talvez no kernel qdo muda de um ciclo para outro
 		this.indiceOperacao = -1;
 		}
 
@@ -55,10 +58,12 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
+		if(escalonador.equals(escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			criaProcessoSRTF(codigo);
-		} else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+		} else if(escalonador.equals(escalonador.FIRST_COME_FIRST_SERVED)) {
 			criaProcessoFCFS(codigo);
+		} else if(escalonador.equals(escalonador.SHORTEST_JOB_FIRST)) {
+			criaProcessoSJF(codigo, proxChuteBurstCPU);
 		}
 	}
 
@@ -69,7 +74,12 @@ public class SeuSO extends SO {
 		Collections.sort(processos, processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB_SRTF processo = new PCB_FCFS(codigo);
+		PCB_FCFS processo = new PCB_FCFS(codigo);
+		processos.add(processo);
+		Collections.sort(processos, processo);
+	}
+	private void criaProcessoSJF(Operacao[] codigo, int proxChuteBurstCPU){
+		PCB_SJF processo = new PCB_SJF(codigo, proxChuteBurstCPU);
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
@@ -92,6 +102,9 @@ public class SeuSO extends SO {
 		// TODO Auto-generated method stub
 		PCB PCBatual = getPCBAtual();
 		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
+			if(PCBatual instanceof PCB_SJF) {
+				PCBAtual.contadorBurst++;
+			}
 			return PCBAtual.codigo[PCBatual.operacoesFeitas];
 		} 
 		else
@@ -103,7 +116,7 @@ public class SeuSO extends SO {
 		PCB PCBatual = getPCBAtual();
 
 		gerateLists();
-		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
+		if(escalonador.equals(escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			if(idProcessoAtual != processos.get(0).idProcesso){
 
 				if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
@@ -128,7 +141,7 @@ public class SeuSO extends SO {
 			executaOperacao(operacaoAtual, PCBatual);
 			PCBatual.operacoesFeitas++;
 		}
-		else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+		else if(escalonador.equals(escalonador.FIRST_COME_FIRST_SERVED)) {
 			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
 				PCBatual.estado = PCB.Estado.PRONTO;
 				return;
@@ -136,8 +149,27 @@ public class SeuSO extends SO {
 			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
 				PCBatual.estado = PCB.Estado.EXECUTANDO;
 			
-			if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
-					PCBatual.estado = PCB.Estado.TERMINADO;
+			if (PCBatual.operacoesFeitas == PCBatual.codigo.length) {
+				PCBatual.estado = PCB.Estado.TERMINADO;
+			}				
+			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
+			executaOperacao(operacaoAtual, PCBatual);
+			PCBatual.operacoesFeitas++;
+			
+
+		}
+		else if(escalonador.equals(escalonador.SHORTEST_JOB_FIRST)) {
+			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
+				PCBatual.estado = PCB.Estado.PRONTO;
+				return;
+			}
+			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
+				PCBatual.estado = PCB.Estado.EXECUTANDO;
+			
+			if (PCBatual.operacoesFeitas == PCBatual.codigo.length) {
+				PCBatual.estado = PCB.Estado.TERMINADO;
+				this.proxChuteBurstCPU = (PCBatual.proxChuteBurstCPU + PCBatual.contadorBurst)/2;
+			}				
 			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
 			executaOperacao(operacaoAtual, PCBatual);
 			PCBatual.operacoesFeitas++;
@@ -247,6 +279,8 @@ public class SeuSO extends SO {
 			executaOperacaoES((OperacaoES) operacao, pcb);
 		else
 			throw new RuntimeException("Operador Inválido");
+
+		pcb.contadorDePrograma++;
 	}
 
 	private static void executaOperacaoES(OperacaoES operacaoES, PCB pcb) {
