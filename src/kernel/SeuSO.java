@@ -1,9 +1,7 @@
 package kernel;
 import java.util.*;
 
-import kernel.PCB.PCB;
-import kernel.PCB.PCB_FCFS;
-import kernel.PCB.PCB_SRTF;
+import kernel.PCB.*;
 import operacoes.Carrega;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
@@ -60,17 +58,33 @@ public class SeuSO extends SO {
 			criaProcessoSRTF(codigo);
 		} else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
 			criaProcessoFCFS(codigo);
-		}
+		} else if(escalonador.equals(Escalonador.ROUND_ROBIN_QUANTUM_5)){
+			criaProcessoRR(codigo);
+		}else if(escalonador.equals(Escalonador.SHORTEST_JOB_FIRST)){
+			criaProcessoSJF(codigo);
+		}else
+			throw new RuntimeException("Escalonador não identificado");
+	}
+
+	private void criaProcessoSJF(Operacao[] codigo) {
+		PCB_SJF processo = new PCB_SJF(codigo, 5);
+		processos.add(processo);
+		Collections.sort(processos, processo);
+	}
+
+	private void criaProcessoRR(Operacao[] codigo) {
+		PCB_RR processo = new PCB_RR(codigo);
+		processos.add(processo);
+		Collections.sort(processos, processo);
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
-		processo.estado = PCB.Estado.ESPERANDO;
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB processo = new PCB_FCFS(codigo);
+		PCB_FCFS processo = new PCB_FCFS(codigo);
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
