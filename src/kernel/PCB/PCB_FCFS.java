@@ -15,7 +15,7 @@ public class PCB_FCFS extends PCB{
         if(!(o1 instanceof PCB_FCFS) || !(o2 instanceof PCB_FCFS) )
             throw new RuntimeException("Objetos não comparaveis");
 
-        int answer = (int) (((PCB_FCFS) o1).idProcesso - ((PCB_SRTF) o2).idProcesso);
+        int answer = (int) (((PCB_FCFS) o1).idProcesso - ((PCB_FCFS) o2).idProcesso);
 
         return answer;
     }
