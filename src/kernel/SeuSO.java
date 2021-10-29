@@ -244,6 +244,11 @@ public class SeuSO extends SO {
 	}
 
 	private void gerateLists(){
+
+		processosProntos = new LinkedList<>();
+		processosEmEspera = new LinkedList<>();
+		processosTerminados = new LinkedList<>();
+
 		processos.forEach(e ->{
 			if(e.estado.equals(PCB.Estado.NOVO))
 				idProcessoNovo = e.idProcesso;
