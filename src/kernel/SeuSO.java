@@ -2,7 +2,6 @@ package kernel;
 import java.util.*;
 
 import kernel.PCB.PCB;
-import kernel.PCB.PCB_RR;
 import kernel.PCB.PCB_SRTF;
 import operacoes.Carrega;
 import operacoes.Operacao;
@@ -29,7 +28,7 @@ public class SeuSO extends SO {
 	List<Integer> processosProntos;
 	int idProcessoAtual;
 	int idProcessoNovo;
-
+	int indiceOperacao;
 
 
 	public SeuSO() {
@@ -47,7 +46,9 @@ public class SeuSO extends SO {
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
-	}
+		this.PCBAtual = null; //precisa inicializar em algum lugar. Talvez no kernel qdo muda de um ciclo para outro
+		this.indiceOperacao = -1;
+		}
 
 	@Override
 	// ATENCÃO: cria o processo mas o mesmo 
@@ -56,33 +57,27 @@ public class SeuSO extends SO {
 	protected void criaProcesso(Operacao[] codigo) {
 		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			criaProcessoSRTF(codigo);
-			return;
+		} else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+			criaProcessoFCFS(codigo);
 		}
-		if(escalonador.equals(Escalonador.ROUND_ROBIN_QUANTUM_5)){
-			criaProcessoRR(codigo);
-			return;
-		}
-	}
-
-	private void criaProcessoRR(Operacao[] codigo) {
-		PCB_RR processo = new PCB_RR(codigo);
-		processos.add(processo);
-		Collections.sort(processos, processo);
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
+		processo.estado = PCB.Estado.ESPERANDO;
+		processos.add(processo);
+		Collections.sort(processos, processo);
+	}
+	private void criaProcessoFCFS(Operacao[] codigo){
+		PCB_SRTF processo = new PCB_FCFS(codigo);
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
 
+
 	@Override
 	protected void trocaContexto(PCB pcbAtual, PCB pcbProximo) {
-		int idPCBAtual = processos.indexOf(pcbAtual);
-		int idPCBProx = processos.indexOf(pcbAtual);
-		processos.get(idPCBAtual).estado = PCB.Estado.ESPERANDO;
-		processos.get(idPCBProx).estado = PCB.Estado.PRONTO;
-		gerateLists();
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -95,7 +90,12 @@ public class SeuSO extends SO {
 	@Override
 	protected Operacao proximaOperacaoCPU() {
 		// TODO Auto-generated method stub
-		return null;
+		PCB PCBatual = getPCBAtual();
+		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
+			return PCBAtual.codigo[PCBatual.operacoesFeitas];
+		} 
+		else
+			return null;
 	}
 
 	@Override
@@ -124,10 +124,28 @@ public class SeuSO extends SO {
 			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
 				PCBatual.estado = PCB.Estado.EXECUTANDO;
 
+			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
+			executaOperacao(operacaoAtual, PCBatual);
+			PCBatual.operacoesFeitas++;
+		}
+		else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
+				PCBatual.estado = PCB.Estado.PRONTO;
+				return;
+			}
+			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
+				PCBatual.estado = PCB.Estado.EXECUTANDO;
+			
+			if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
+					PCBatual.estado = PCB.Estado.TERMINADO;
+			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
+			executaOperacao(operacaoAtual, PCBatual);
+			PCBatual.operacoesFeitas++;
+			
+
 		}
 
-		//TODO Ciclo Kernel RR
-	}
+	} 
 
 	@Override
 	protected boolean temTarefasPendentes() {
@@ -220,4 +238,29 @@ public class SeuSO extends SO {
 		throw new RuntimeException("PCb atual nulo");
 	}
 
+	private static void executaOperacao(Operacao operacao, PCB pcb){
+		if(operacao instanceof Soma)
+			excutaSoma((Soma) operacao, pcb);
+		if(operacao instanceof Carrega)
+			executaCarrega((Carrega) operacao, pcb);
+		if(operacao instanceof OperacaoES)
+			executaOperacaoES((OperacaoES) operacao, pcb);
+		else
+			throw new RuntimeException("Operador Inválido");
+	}
+
+	private static void executaOperacaoES(OperacaoES operacaoES, PCB pcb) {
+		//TODO Operação ES
+	}
+
+	private static void executaCarrega(Carrega carrega, PCB pcb) {
+		pcb.registradores[carrega.registrador] = carrega.valor;
+	}
+
+	private static void excutaSoma(Soma soma, PCB pcb) {
+		int parcela1 = pcb.registradores[soma.registradorParcela1];
+		int parcela2 = pcb.registradores[soma.registradorParcela2];
+		int result = parcela1 + parcela2;
+		pcb.registradores[soma.registradorTotal] = result;
+	}
 }
