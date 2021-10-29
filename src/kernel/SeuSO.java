@@ -102,52 +102,37 @@ public class SeuSO extends SO {
 
 	@Override
 	protected void executaCicloKernel() {
-		PCB PCBatual = getPCBAtual();
-
 		gerateLists();
-		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
-			if(idProcessoAtual != processos.get(0).idProcesso){
+		int i = 0;
+		for(PCB pcb: processos){
 
-				if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
-					PCBatual.estado = PCB.Estado.TERMINADO;
-				else
-					PCBatual.estado = PCB.Estado.ESPERANDO;
 
-				PCB PCBproximo = processos.get(0);
-				trocaContexto(PCBatual, PCBproximo);
-				return;
+			if(pcb.operacoesFeitas == pcb.codigo.length)
+				pcb.estado = PCB.Estado.TERMINADO;
+
+			if(pcb.codigo[pcb.operacoesFeitas] instanceof OperacaoES) {
+				pcb.estado = PCB.Estado.ESPERANDO;
 			}
-
-			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
-				PCBatual.estado = PCB.Estado.PRONTO;
-				return;
+			else {
+				if(pcb.estado.equals(PCB.Estado.NOVO)){
+					pcb.estado = PCB.Estado.PRONTO;
+				}if(pcb.estado.equals(PCB.Estado.PRONTO)){
+					if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso)
+						pcb.estado = PCB.Estado.EXECUTANDO;
+				}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
+					 if(processos.get(0).idProcesso != pcb.idProcesso)
+						trocaContexto(pcb, processos.get(0));
 			}
-
-			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
-				PCBatual.estado = PCB.Estado.EXECUTANDO;
-
-			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
-			executaOperacao(operacaoAtual, PCBatual);
-			PCBatual.operacoesFeitas++;
+			processos.set(i, pcb);
+			i++;
 		}
-		else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
-			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
-				PCBatual.estado = PCB.Estado.PRONTO;
-				return;
-			}
-			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
-				PCBatual.estado = PCB.Estado.EXECUTANDO;
-			
-			if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
-					PCBatual.estado = PCB.Estado.TERMINADO;
-			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
-			executaOperacao(operacaoAtual, PCBatual);
-			PCBatual.operacoesFeitas++;
-			
+		gerateLists();
+	}
 
-		}
-
-	} 
+	private boolean cpuExecutando() {
+		PCBAtual = processos.get(idProcessoExecutando());
+		return ! (PCBAtual.operacoesFeitas == PCBAtual.codigo.length);
+	}
 
 	@Override
 	protected boolean temTarefasPendentes() {
