@@ -121,9 +121,11 @@ public class SeuSO extends SO {
 			return null;
 		Operacao answer =  pcbAtual.codigo[pcbAtual.operacoesFeitas];
 
-		return answer instanceof OperacaoES ?
-				(OperacaoES) answer:
-				null;
+		if(! (answer instanceof  OperacaoES))
+			return null;
+
+		pcbAtual.operacoesFeitas += ((OperacaoES) answer).ciclos;
+		return (OperacaoES) answer;
 	}
 
 	@Override
@@ -177,7 +179,15 @@ public class SeuSO extends SO {
 
 	@Override
 	protected boolean temTarefasPendentes() {
-		return this.processosEmEspera.isEmpty();
+		boolean isFinish = false;
+		for(PCB processo: processos){
+			if (!processo.estado.equals(PCB.Estado.TERMINADO)) {
+				isFinish = true;
+				break;
+			}
+		}
+
+		return isFinish;
 	}
 
 	@Override
