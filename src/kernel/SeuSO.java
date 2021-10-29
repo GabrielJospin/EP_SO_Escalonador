@@ -11,7 +11,7 @@ import operacoes.Soma;
 
 public class SeuSO extends SO {
 
-	private PCB PCBAtual;
+
 	//Escalonador
 	private Escalonador escalonador;
 	List<PCB> processos;
@@ -48,7 +48,6 @@ public class SeuSO extends SO {
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
-		this.PCBAtual = null; //precisa inicializar em algum lugar. Talvez no kernel qdo muda de um ciclo para outro
 		this.indiceOperacao = -1;
 		}
 
@@ -79,7 +78,17 @@ public class SeuSO extends SO {
 
 	@Override
 	protected void trocaContexto(PCB pcbAtual, PCB pcbProximo) {
-		// TODO Auto-generated method stub
+		int idAtual = processos.indexOf(pcbAtual);
+		int idProximo = processos.indexOf(pcbProximo);
+
+		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length)
+			pcbAtual.estado = PCB.Estado.TERMINADO;
+		else
+			pcbAtual.estado = PCB.Estado.PRONTO;
+
+		pcbProximo.estado = PCB.Estado.EXECUTANDO;
+		processos.set(idAtual, pcbAtual);
+		processos.set(idProximo, pcbProximo);
 	}
 
 	@Override
@@ -133,7 +142,7 @@ public class SeuSO extends SO {
 	}
 
 	private boolean cpuExecutando() {
-		PCBAtual = processos.get(idProcessoExecutando());
+		PCB PCBAtual = processos.get(idProcessoExecutando());
 		return ! (PCBAtual.operacoesFeitas == PCBAtual.codigo.length);
 	}
 
