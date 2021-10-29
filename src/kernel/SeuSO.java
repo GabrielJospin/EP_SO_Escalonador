@@ -2,10 +2,8 @@ package kernel;
 import java.util.*;
 
 import kernel.PCB.*;
-import operacoes.Carrega;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
-import operacoes.Soma;
 
 public class SeuSO extends SO {
 
@@ -108,8 +106,16 @@ public class SeuSO extends SO {
 	@Override
 	// Assuma que 0 <= idDispositivo <= 4
 	protected OperacaoES proximaOperacaoES(int idDispositivo) {
-		// TODO Auto-generated method stub
-		return null;
+		PCB pcbAtual = null;
+		int pos;
+
+		Integer pcb = idProcessosEsperando().get(0);
+		for(PCB processo: processos){
+			if(processo.idProcesso == pcb)
+				pcbAtual = processo;
+		}
+
+		return pcbAtual != null? (OperacaoES) pcbAtual.codigo[pcbAtual.operacoesFeitas]: null;
 	}
 
 	@Override
