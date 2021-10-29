@@ -31,9 +31,9 @@ public class SeuSO extends SO {
 	int indiceOperacao;
 
 	//SJF
-	if(escalonador.SHORTEST_JOB_FIRST) {
-		public proxChuteBurstCPU = 5;
-	}
+	
+	public proxChuteBurstCPU = 5;
+	
 
 	public SeuSO() {
 		this.escalonador = null;
