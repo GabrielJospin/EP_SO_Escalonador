@@ -2,6 +2,7 @@ package kernel;
 import java.util.*;
 
 import kernel.PCB.PCB;
+import kernel.PCB.PCB_FCFS;
 import kernel.PCB.PCB_SRTF;
 import operacoes.Carrega;
 import operacoes.Operacao;
@@ -10,6 +11,7 @@ import operacoes.Soma;
 
 public class SeuSO extends SO {
 
+	private PCB PCBAtual;
 	//Escalonador
 	private Escalonador escalonador;
 	List<PCB> processos;
@@ -69,7 +71,7 @@ public class SeuSO extends SO {
 		Collections.sort(processos, processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB_SRTF processo = new PCB_FCFS(codigo);
+		PCB processo = new PCB_FCFS(codigo);
 		processos.add(processo);
 		Collections.sort(processos, processo);
 	}
@@ -92,7 +94,7 @@ public class SeuSO extends SO {
 		// TODO Auto-generated method stub
 		PCB PCBatual = getPCBAtual();
 		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
-			return PCBAtual.codigo[PCBatual.operacoesFeitas];
+			return PCBatual.codigo[PCBatual.operacoesFeitas];
 		} 
 		else
 			return null;
