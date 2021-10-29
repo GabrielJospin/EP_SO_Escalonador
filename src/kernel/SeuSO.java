@@ -107,7 +107,6 @@ public class SeuSO extends SO {
 	// Assuma que 0 <= idDispositivo <= 4
 	protected OperacaoES proximaOperacaoES(int idDispositivo) {
 		PCB pcbAtual = null;
-		int pos;
 
 		Integer pcb = idProcessosEsperando().get(0);
 		for(PCB processo: processos){
