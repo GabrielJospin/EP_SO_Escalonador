@@ -114,7 +114,7 @@ public class SeuSO extends SO {
 				pcbAtual = processo;
 		}
 
-		return pcbAtual != null? (OperacaoES) pcbAtual.codigo[pcbAtual.operacoesFeitas]: null;
+		return pcbAtual != null ? (OperacaoES) pcbAtual.codigo[pcbAtual.operacoesFeitas]: null;
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class SeuSO extends SO {
 			processos.set(idProcessoAtual, PCBatual);
 			Operacao answer = PCBatual.codigo[PCBatual.operacoesFeitas];
 			PCBatual.operacoesFeitas++;
-			return answer;
+			return answer instanceof OperacaoES? null: answer;
 		} 
 		else
 			return null;
