@@ -17,8 +17,8 @@ public class Teste {
         list.add(21);
         list.add(22);
 
-        final int INIT = 1;
-        final int END = 24;
+        final int INIT = 16;
+        final int END = 16;
         for (int i = INIT; i <= END; i++ ){
             if(!(list.contains(i))){
                 String[] context = new String[1];

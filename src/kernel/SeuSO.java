@@ -13,7 +13,6 @@ public class SeuSO extends SO {
 	List<PCB> processos;
 
 	//Variaveis de Tempo
-	//TODO Parte de Tempo
 
 
 	private int quantidadeDeProcessos;
