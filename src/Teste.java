@@ -20,16 +20,17 @@ public class Teste {
         final int INIT = 0;
         final int END = 24;
         for (int i = INIT; i <= END; i++ ){
-            String[] context = new String[1];
-            context[0] = String.format("entradas/teste%d.txt", i);
-            System.out.printf("PROXIMO TESTE \n\n Teste %d: \n", i);
-            try {
-                if(!(list.contains(i)))
-                    Main.main(context);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            if(!(list.contains(i))){
+                String[] context = new String[1];
+                context[0] = String.format("entradas/teste%d.txt", i);
+                System.out.printf("PROXIMO TESTE \n\n Teste %d: \n", i);
+                try {
 
+                    Main.main(context);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
     }
