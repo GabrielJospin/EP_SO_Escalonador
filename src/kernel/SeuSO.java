@@ -78,24 +78,24 @@ public class SeuSO extends SO {
 	private void criaProcessoSJF(Operacao[] codigo) {
 		PCB_SJF processo = new PCB_SJF(codigo, 5);
 		processos.add(processo);
-		Collections.sort(processos, processo);
+		processos.sort(processo);
 	}
 
 	private void criaProcessoRR(Operacao[] codigo) {
 		PCB_RR processo = new PCB_RR(codigo);
 		processos.add(processo);
-		Collections.sort(processos, processo);
+		processos.sort(processo);
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
 		PCB_SRTF processo = new PCB_SRTF(codigo);
 		processos.add(processo);
-		Collections.sort(processos, processo);
+		processos.sort(processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
 		PCB_FCFS processo = new PCB_FCFS(codigo);
 		processos.add(processo);
-		Collections.sort(processos, processo);
+		processos.sort(processo);
 	}
 
 
@@ -135,9 +135,7 @@ public class SeuSO extends SO {
 		if(!( op instanceof OperacaoES))
 			return null;
 
-		OperacaoES OPES = (OperacaoES) op;
-
-		return OPES;
+		return (OperacaoES) op;
 
 	}
 
