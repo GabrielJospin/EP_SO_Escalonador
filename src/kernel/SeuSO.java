@@ -18,7 +18,10 @@ public class SeuSO extends SO {
 	//TODO Parte de Tempo
 
 	LocalDateTime timeInitEspera;
-	LocalDateTime timeFinalTotal;
+	LocalDateTime timeEsperaTotal;
+
+	LocalDateTime timeInitResposta;
+	LocalDateTime timeRespostaFinal;
 
 	private int quantidadeDeProcessos;
 	private Long tempoEsperaTotal; //Valor em ms
@@ -73,6 +76,7 @@ public class SeuSO extends SO {
 		}else
 			throw new RuntimeException("Escalonador não identificado");
 	    quantidadeDeProcessos++;
+		timeInitResposta = LocalDateTime.now();
     }
 
 	private void criaProcessoSJF(Operacao[] codigo) {
@@ -203,8 +207,8 @@ public class SeuSO extends SO {
 						pcb.estado = PCB.Estado.ESPERANDO;
 					}
 					if(((OperacaoES) op).ciclos == 0 ) {
-						this.timeFinalTotal = LocalDateTime.now();
-						this.tempoEsperaTotal += (timeInitEspera.until(timeFinalTotal, ChronoUnit.MICROS));
+						this.timeEsperaTotal = LocalDateTime.now();
+						this.tempoEsperaTotal += (timeInitEspera.until(timeEsperaTotal, ChronoUnit.MICROS));
 						pcb.estado = PCB.Estado.EXECUTANDO;
 						pcb.operacoesFeitas += 1;
 					}
@@ -237,6 +241,7 @@ public class SeuSO extends SO {
 			}
 		}
 		gerateLists();
+
 	}
 
 	private boolean cpuExecutando() {
@@ -247,7 +252,8 @@ public class SeuSO extends SO {
 
 	@Override
 	protected boolean temTarefasPendentes() {
-		return processos.size() > 0;
+
+		return processos.size() != 0;
 	}
 
 	@Override
@@ -291,8 +297,9 @@ public class SeuSO extends SO {
 	protected int tempoRespostaMedio() {
 		if(quantidadeDeProcessos == 0)
 			return -1;
-
-		return (int) (tempoRespostaTotal/quantidadeDeProcessos);
+		LocalDateTime finale = LocalDateTime.now();
+		float unit = timeInitResposta.until(finale, ChronoUnit.MICROS);
+		return (int) (unit/quantidadeDeProcessos);
 	}
 
 	@Override
