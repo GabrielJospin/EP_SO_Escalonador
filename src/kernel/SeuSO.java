@@ -206,7 +206,7 @@ public class SeuSO extends SO {
 					}
 					if(((OperacaoES) op).ciclos == 0 ) {
 						this.timeFinalTotal = LocalDateTime.now();
-						this.tempoEsperaTotal += (timeInitEspera.until(timeFinalTotal, ChronoUnit.MILLIS));
+						this.tempoEsperaTotal += (timeInitEspera.until(timeFinalTotal, ChronoUnit.MICROS));
 						pcb.estado = PCB.Estado.EXECUTANDO;
 						pcb.operacoesFeitas += 1;
 					}
