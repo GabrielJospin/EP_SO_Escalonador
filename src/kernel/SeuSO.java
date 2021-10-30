@@ -98,6 +98,8 @@ public class SeuSO extends SO {
 
 		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length)
 			pcbAtual.estado = PCB.Estado.TERMINADO;
+		else if((pcbAtual.codigo[pcbAtual.operacoesFeitas] instanceof OperacaoES))
+			pcbAtual.estado = PCB.Estado.ESPERANDO;
 		else
 			pcbAtual.estado = PCB.Estado.PRONTO;
 
@@ -112,7 +114,7 @@ public class SeuSO extends SO {
 		if(idProcessosEsperando().size() == 0)
 			return null;
 
-		PCB processo = getPCBAtual();
+		PCB processo = getPCBespera(idDispositivo);
 
 		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
 			return null;
@@ -123,12 +125,20 @@ public class SeuSO extends SO {
 
 		OperacaoES OPES = (OperacaoES) op;
 
-		if (OPES.idDispositivo == idDispositivo){
-			return OPES;
+		return OPES;
+
+	}
+
+	private PCB getPCBespera(int idDispositivo) {
+
+		gerateLists();
+
+		for( PCB processo: processos){
+			Operacao op =  processo.codigo[processo.operacoesFeitas];
+			if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+				return processo;
 		}
-
 		return null;
-
 	}
 
 	@Override
@@ -140,8 +150,14 @@ public class SeuSO extends SO {
 			processos.set(local, PCBatual);
 			Operacao answer = PCBatual.codigo[pos];
 
-			if(answer instanceof OperacaoES)
+			if(answer instanceof OperacaoES){
+				for(PCB processo: processos){
+					if(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES)){
+						return processo.codigo[processo.operacoesFeitas];
+					}
+				}
 				return null;
+			}
 
 			PCBatual.operacoesFeitas++;
 			return answer;
@@ -191,7 +207,6 @@ public class SeuSO extends SO {
 
 			processos.set(i, pcb);
 			if(pcb.idProcesso == processos.get(0).idProcesso)
-				System.out.printf("Hello");
 			i++;
 		}
 		if(temNovosTerminados){
@@ -284,7 +299,7 @@ public class SeuSO extends SO {
 		processosEmEspera = new LinkedList<>();
 		processosTerminados = new LinkedList<>();
 
-		processos.forEach(e ->{
+		for(PCB e: processos){
 			if(e.estado.equals(PCB.Estado.NOVO))
 				idProcessoNovo = e.idProcesso;
 			if(e.estado.equals(PCB.Estado.PRONTO))
@@ -297,7 +312,8 @@ public class SeuSO extends SO {
 				processosTerminados.add(e.idProcesso);
 
 			}
-		});
+		}
+
 	}
 
 	private PCB getPCBAtual(){
