@@ -1,4 +1,6 @@
 package kernel;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import kernel.PCB.*;
@@ -14,6 +16,10 @@ public class SeuSO extends SO {
 
 	//Variaveis de Tempo
 	//TODO Parte de Tempo
+
+	LocalDateTime timeInitEspera;
+	LocalDateTime timeFinalTotal;
+
 	private int quantidadeDeProcessos;
 	private Long tempoEsperaTotal; //Valor em ms
 	private Long tempoRespostaTotal; // Valor em ms
@@ -66,7 +72,8 @@ public class SeuSO extends SO {
 			criaProcessoSJF(codigo);
 		}else
 			throw new RuntimeException("Escalonador não identificado");
-	}
+	    quantidadeDeProcessos++;
+    }
 
 	private void criaProcessoSJF(Operacao[] codigo) {
 		PCB_SJF processo = new PCB_SJF(codigo, 5);
@@ -99,8 +106,10 @@ public class SeuSO extends SO {
 
 		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length)
 			pcbAtual.estado = PCB.Estado.TERMINADO;
-		else if((pcbAtual.codigo[pcbAtual.operacoesFeitas] instanceof OperacaoES))
+		else if((pcbAtual.codigo[pcbAtual.operacoesFeitas] instanceof OperacaoES)) {
+			timeInitEspera = LocalDateTime.now();
 			pcbAtual.estado = PCB.Estado.ESPERANDO;
+		}
 		else
 			pcbAtual.estado = PCB.Estado.PRONTO;
 
@@ -190,9 +199,14 @@ public class SeuSO extends SO {
 			}else{
 				Operacao op = pcb.codigo[pcb.operacoesFeitas];
 				if(op instanceof OperacaoES) {
-					if(pcb.codigo == processos.get(0).codigo)
+					if(pcb.codigo == processos.get(0).codigo){
+						if(this.timeInitEspera == null)
+							timeInitEspera = LocalDateTime.now();
 						pcb.estado = PCB.Estado.ESPERANDO;
+					}
 					if(((OperacaoES) op).ciclos == 0 ) {
+						this.timeFinalTotal = LocalDateTime.now();
+						this.tempoEsperaTotal += (timeInitEspera.until(timeFinalTotal, ChronoUnit.MILLIS));
 						pcb.estado = PCB.Estado.EXECUTANDO;
 						pcb.operacoesFeitas += 1;
 					}
@@ -201,8 +215,10 @@ public class SeuSO extends SO {
 					if(pcb.estado.equals(PCB.Estado.NOVO)){
 						pcb.estado = PCB.Estado.PRONTO;
 					}if(pcb.estado.equals(PCB.Estado.PRONTO)){
-						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso)
+						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
+							this.trocasDeProcesso++;
 							pcb.estado = PCB.Estado.EXECUTANDO;
+						}
 					}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
 						if(processos.get(0).idProcesso != pcb.idProcesso)
 							trocaContexto(pcb, processos.get(0));
