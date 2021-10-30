@@ -17,7 +17,7 @@ public class Teste {
         list.add(21);
         list.add(22);
 
-        final int INIT = 0;
+        final int INIT = 1;
         final int END = 24;
         for (int i = INIT; i <= END; i++ ){
             if(!(list.contains(i))){

@@ -224,16 +224,17 @@ public class SeuSO extends SO {
 
 			}
 
-			processos.set(i, pcb);
+			processos.set(processos.indexOf(pcb), pcb);
 			if(pcb.idProcesso == processos.get(0).idProcesso)
 			i++;
 		}
 		if(temNovosTerminados){
 			for(PCB processo : terminadosList){
-				if(processo.estado.equals(PCB.Estado.TERMINADO))
+				if(processo.estado.equals(PCB.Estado.TERMINADO)) {
 					processos.remove(processo);
+					processosTerminados.add(processo.idProcesso);
+				}
 			}
-			terminadosList.clear();
 		}
 		gerateLists();
 	}
@@ -316,7 +317,6 @@ public class SeuSO extends SO {
 
 		processosProntos = new LinkedList<>();
 		processosEmEspera = new LinkedList<>();
-		processosTerminados = new LinkedList<>();
 
 		for(PCB e: processos){
 			if(e.estado.equals(PCB.Estado.NOVO))
@@ -327,10 +327,6 @@ public class SeuSO extends SO {
 				idProcessoAtual = e.idProcesso;
 			if(e.estado.equals(PCB.Estado.ESPERANDO))
 				processosEmEspera.add(e.idProcesso);
-			if(e.estado.equals(PCB.Estado.TERMINADO)) {
-				processosTerminados.add(e.idProcesso);
-
-			}
 		}
 
 	}

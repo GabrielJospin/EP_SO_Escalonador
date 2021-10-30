@@ -35,6 +35,7 @@ public abstract class SO {
 			}
 
 			executaUmCiclo();
+			//TODO Estado
 			//imprimeEstado();
 		}
 
