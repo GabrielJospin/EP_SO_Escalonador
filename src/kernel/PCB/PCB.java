@@ -1,6 +1,8 @@
 package kernel.PCB;
 import operacoes.Operacao;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 
 //Freire comunista confirmado
@@ -17,6 +19,12 @@ public abstract class PCB implements Comparator<PCB> {
 	public static int processosfeitos = 0;
 	public int operacoesFeitas;
 
+	private LocalDateTime tempoEsperaInicio;
+	public int tempoEspera;
+
+	private LocalDateTime tempoRespostaInicio;
+	public int tempoResposta;
+
 	public PCB( Operacao[] codigo) {
 		this.idProcesso = processosfeitos;
 		this.estado = Estado.NOVO;
@@ -25,7 +33,27 @@ public abstract class PCB implements Comparator<PCB> {
 		this.codigo = codigo;
 		this.proximoChute = 5;
 		this.operacoesFeitas = 0;
+		this.tempoEspera = 0;
+		this.tempoRespostaInicio = LocalDateTime.now();
+		this.tempoResposta = 0;
 		processosfeitos++;
+	}
+
+	public void updateEstado(Estado estado){
+		if(estado.equals(Estado.PRONTO))
+			this.tempoEsperaInicio = LocalDateTime.now();
+
+		if(this.estado.equals(Estado.PRONTO)){
+			int delta = (int) tempoEsperaInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
+			this.tempoEspera += delta;
+		}
+
+		if(estado.equals(Estado.TERMINADO)){
+			int delta = (int) tempoRespostaInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
+			this.tempoResposta += delta;
+		}
+
+		this.estado = estado;
 	}
 
 	@Override

@@ -17,11 +17,6 @@ public class SeuSO extends SO {
 	//Variaveis de Tempo
 	//TODO Parte de Tempo
 
-	LocalDateTime timeInitEspera;
-	LocalDateTime timeEsperaTotal;
-
-	LocalDateTime timeInitResposta;
-	LocalDateTime timeRespostaFinal;
 
 	private int quantidadeDeProcessos;
 	private Long tempoEsperaTotal; //Valor em ms
@@ -76,7 +71,6 @@ public class SeuSO extends SO {
 		}else
 			throw new RuntimeException("Escalonador não identificado");
 	    quantidadeDeProcessos++;
-		timeInitResposta = LocalDateTime.now();
     }
 
 	private void criaProcessoSJF(Operacao[] codigo) {
@@ -109,15 +103,14 @@ public class SeuSO extends SO {
 		int idProximo = processos.indexOf(pcbProximo);
 
 		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length)
-			pcbAtual.estado = PCB.Estado.TERMINADO;
+			pcbAtual.updateEstado(PCB.Estado.TERMINADO);
 		else if((pcbAtual.codigo[pcbAtual.operacoesFeitas] instanceof OperacaoES)) {
-			timeInitEspera = LocalDateTime.now();
-			pcbAtual.estado = PCB.Estado.ESPERANDO;
+			pcbAtual.updateEstado(PCB.Estado.ESPERANDO);
 		}
 		else
-			pcbAtual.estado = PCB.Estado.PRONTO;
+			pcbAtual.updateEstado(PCB.Estado.PRONTO);
 
-		pcbProximo.estado = PCB.Estado.EXECUTANDO;
+		pcbAtual.updateEstado(PCB.Estado.EXECUTANDO);
 		processos.set(idAtual, pcbAtual);
 		processos.set(idProximo, pcbProximo);
 
@@ -187,7 +180,6 @@ public class SeuSO extends SO {
 	@Override
 	protected void executaCicloKernel() {
 		gerateLists();
-		int i = 0;
 		boolean temNovosTerminados = false;
 		List<PCB> terminadosList = new ArrayList<>();
 
@@ -195,31 +187,26 @@ public class SeuSO extends SO {
 
 
 			if(pcb.operacoesFeitas == pcb.codigo.length) {
-				pcb.estado = PCB.Estado.TERMINADO;
+				pcb.updateEstado(PCB.Estado.TERMINADO);
 				temNovosTerminados = true;
 				terminadosList.add(pcb);
 			}else{
 				Operacao op = pcb.codigo[pcb.operacoesFeitas];
 				if(op instanceof OperacaoES) {
 					if(pcb.codigo == processos.get(0).codigo){
-						if(this.timeInitEspera == null)
-							timeInitEspera = LocalDateTime.now();
-						pcb.estado = PCB.Estado.ESPERANDO;
+						pcb.updateEstado(PCB.Estado.ESPERANDO);
 					}
 					if(((OperacaoES) op).ciclos == 0 ) {
-						this.timeEsperaTotal = LocalDateTime.now();
-						this.tempoEsperaTotal += (timeInitEspera.until(timeEsperaTotal, ChronoUnit.MICROS));
-						pcb.estado = PCB.Estado.EXECUTANDO;
+						pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						pcb.operacoesFeitas += 1;
 					}
 				}
 				else {
 					if(pcb.estado.equals(PCB.Estado.NOVO)){
-						pcb.estado = PCB.Estado.PRONTO;
+						pcb.updateEstado(PCB.Estado.PRONTO);
 					}if(pcb.estado.equals(PCB.Estado.PRONTO)){
 						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
-							this.trocasDeProcesso++;
-							pcb.estado = PCB.Estado.EXECUTANDO;
+							pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						}
 					}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
 						if(processos.get(0).idProcesso != pcb.idProcesso)
@@ -229,14 +216,14 @@ public class SeuSO extends SO {
 			}
 
 			processos.set(processos.indexOf(pcb), pcb);
-			if(pcb.idProcesso == processos.get(0).idProcesso)
-			i++;
 		}
 		if(temNovosTerminados){
 			for(PCB processo : terminadosList){
 				if(processo.estado.equals(PCB.Estado.TERMINADO)) {
 					processos.remove(processo);
 					processosTerminados.add(processo.idProcesso);
+					tempoRespostaTotal += processo.tempoResposta;
+					tempoEsperaTotal += processo.tempoEspera;
 				}
 			}
 		}
@@ -297,9 +284,7 @@ public class SeuSO extends SO {
 	protected int tempoRespostaMedio() {
 		if(quantidadeDeProcessos == 0)
 			return -1;
-		LocalDateTime finale = LocalDateTime.now();
-		float unit = timeInitResposta.until(finale, ChronoUnit.MICROS);
-		return (int) (unit/quantidadeDeProcessos);
+		return (int) (tempoRespostaTotal/quantidadeDeProcessos);
 	}
 
 	@Override
@@ -312,7 +297,7 @@ public class SeuSO extends SO {
 
 	@Override
 	protected int trocasContexto() {
-		return this.trocasDeProcesso;
+		return this.trocasDeProcesso/quantidadeDeProcessos;
 	}
 
 	@Override
