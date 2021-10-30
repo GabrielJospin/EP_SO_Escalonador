@@ -56,6 +56,12 @@ public abstract class PCB implements Comparator<PCB> {
 		this.estado = estado;
 	}
 
+	public  int getTempoResposta(){
+		if(operacoesFeitas > 0)
+			return (tempoRetorno - tempoEspera)/operacoesFeitas;
+		return -1;
+	}
+
 	@Override
 	public abstract int compare(PCB o1, PCB o2);
 /*

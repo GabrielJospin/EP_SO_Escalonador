@@ -222,6 +222,7 @@ public class SeuSO extends SO {
 					processosTerminados.add(processo.idProcesso);
 					tempoRetornoTotal += processo.tempoRetorno;
 					tempoEsperaTotal += processo.tempoEspera;
+					tempoRespostaTotal += processo.getTempoResposta();
 				}
 			}
 		}
