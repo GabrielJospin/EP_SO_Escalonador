@@ -25,7 +25,9 @@ public abstract class SO {
 	}
 
 	public void simula() {
+		//TODO tirar i
 		while (!novosProcessos.isEmpty() || temTarefasPendentes()) {
+
 			Operacao[] codigo = novosProcessos.get(contadorCiclos);
 
 			if (codigo != null) {

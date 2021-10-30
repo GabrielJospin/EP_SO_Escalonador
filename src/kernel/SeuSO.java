@@ -109,33 +109,42 @@ public class SeuSO extends SO {
 	@Override
 	// Assuma que 0 <= idDispositivo <= 4
 	protected OperacaoES proximaOperacaoES(int idDispositivo) {
-		PCB pcbAtual = null;
+		if(idProcessosEsperando().size() == 0)
+			return null;
 
-		Integer pcb = idProcessosEsperando().get(0);
-		for(PCB processo: processos){
-			if(processo.idProcesso == pcb)
-				pcbAtual = processo;
+		PCB processo = getPCBAtual();
+
+		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
+			return null;
+
+		Operacao op = processo.codigo[processo.operacoesFeitas];
+		if(!( op instanceof OperacaoES))
+			return null;
+
+		OperacaoES OPES = (OperacaoES) op;
+
+		if (OPES.idDispositivo == idDispositivo){
+			return OPES;
 		}
 
-		if(pcbAtual == null)
-			return null;
-		Operacao answer =  pcbAtual.codigo[pcbAtual.operacoesFeitas];
+		return null;
 
-		if(! (answer instanceof  OperacaoES))
-			return null;
-
-		pcbAtual.operacoesFeitas += ((OperacaoES) answer).ciclos;
-		return (OperacaoES) answer;
 	}
 
 	@Override
 	protected Operacao proximaOperacaoCPU() {
 		PCB PCBatual = getPCBAtual();
-		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
-			processos.set(idProcessoAtual, PCBatual);
-			Operacao answer = PCBatual.codigo[PCBatual.operacoesFeitas];
+		if(PCBatual != null && PCBatual.operacoesFeitas  < (PCBatual.codigo.length )){
+			int pos = PCBatual.operacoesFeitas;
+			int local = processos.indexOf(PCBatual);
+			processos.set(local, PCBatual);
+			Operacao answer = PCBatual.codigo[pos];
+
+			if(answer instanceof OperacaoES)
+				return null;
+
 			PCBatual.operacoesFeitas++;
-			return answer instanceof OperacaoES? null: answer;
+			return answer;
 		} 
 		else
 			return null;
@@ -147,47 +156,63 @@ public class SeuSO extends SO {
 	protected void executaCicloKernel() {
 		gerateLists();
 		int i = 0;
+		boolean temNovosTerminados = false;
+		List<PCB> terminadosList = new ArrayList<>();
+
 		for(PCB pcb: processos){
 
 
-			if(pcb.operacoesFeitas == pcb.codigo.length)
+			if(pcb.operacoesFeitas == pcb.codigo.length) {
 				pcb.estado = PCB.Estado.TERMINADO;
-
-			if(pcb.codigo[pcb.operacoesFeitas] instanceof OperacaoES) {
-				pcb.estado = PCB.Estado.ESPERANDO;
-			}
-			else {
-				if(pcb.estado.equals(PCB.Estado.NOVO)){
-					pcb.estado = PCB.Estado.PRONTO;
-				}if(pcb.estado.equals(PCB.Estado.PRONTO)){
-					if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso)
+				temNovosTerminados = true;
+				terminadosList.add(pcb);
+			}else{
+				Operacao op = pcb.codigo[pcb.operacoesFeitas];
+				if(op instanceof OperacaoES) {
+					if(pcb.codigo == processos.get(0).codigo)
+						pcb.estado = PCB.Estado.ESPERANDO;
+					if(((OperacaoES) op).ciclos == 0 ) {
 						pcb.estado = PCB.Estado.EXECUTANDO;
-				}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
-					 if(processos.get(0).idProcesso != pcb.idProcesso)
-						trocaContexto(pcb, processos.get(0));
+						pcb.operacoesFeitas += 1;
+					}
+				}
+				else {
+					if(pcb.estado.equals(PCB.Estado.NOVO)){
+						pcb.estado = PCB.Estado.PRONTO;
+					}if(pcb.estado.equals(PCB.Estado.PRONTO)){
+						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso)
+							pcb.estado = PCB.Estado.EXECUTANDO;
+					}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
+						if(processos.get(0).idProcesso != pcb.idProcesso)
+							trocaContexto(pcb, processos.get(0));
+				}
+
 			}
+
 			processos.set(i, pcb);
+			if(pcb.idProcesso == processos.get(0).idProcesso)
+				System.out.printf("Hello");
 			i++;
+		}
+		if(temNovosTerminados){
+			for(PCB processo : terminadosList){
+				if(processo.estado.equals(PCB.Estado.TERMINADO))
+					processos.remove(processo);
+			}
+			terminadosList.clear();
 		}
 		gerateLists();
 	}
 
 	private boolean cpuExecutando() {
-		PCB PCBAtual = processos.get(idProcessoExecutando());
-		return ! (PCBAtual.operacoesFeitas == PCBAtual.codigo.length);
+		PCB PCBAtual = getPCBAtual();
+		assert PCBAtual != null;
+		return PCBAtual.idProcesso == this.idProcessoAtual;
 	}
 
 	@Override
 	protected boolean temTarefasPendentes() {
-		boolean isFinish = false;
-		for(PCB processo: processos){
-			if (!processo.estado.equals(PCB.Estado.TERMINADO)) {
-				isFinish = true;
-				break;
-			}
-		}
-
-		return isFinish;
+		return processos.size() > 0;
 	}
 
 	@Override
@@ -268,18 +293,15 @@ public class SeuSO extends SO {
 				idProcessoAtual = e.idProcesso;
 			if(e.estado.equals(PCB.Estado.ESPERANDO))
 				processosEmEspera.add(e.idProcesso);
-			if(e.estado.equals(PCB.Estado.TERMINADO))
+			if(e.estado.equals(PCB.Estado.TERMINADO)) {
 				processosTerminados.add(e.idProcesso);
+
+			}
 		});
 	}
 
 	private PCB getPCBAtual(){
-		gerateLists();
-		for (PCB processo : processos)
-			if (processo.idProcesso == idProcessoAtual)
-				return processo;
-
-		throw new RuntimeException("PCB nulo");
+		return processos.size() != 0 ?  processos.get(0): null;
 	}
 
 }
