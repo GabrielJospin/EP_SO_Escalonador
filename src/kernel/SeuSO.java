@@ -1,6 +1,4 @@
 package kernel;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import kernel.PCB.*;
@@ -222,7 +220,7 @@ public class SeuSO extends SO {
 				if(processo.estado.equals(PCB.Estado.TERMINADO)) {
 					processos.remove(processo);
 					processosTerminados.add(processo.idProcesso);
-					tempoRespostaTotal += processo.tempoResposta;
+					tempoRetornoTotal += processo.tempoRetorno;
 					tempoEsperaTotal += processo.tempoEspera;
 				}
 			}

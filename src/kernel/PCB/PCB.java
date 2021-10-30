@@ -22,8 +22,8 @@ public abstract class PCB implements Comparator<PCB> {
 	private LocalDateTime tempoEsperaInicio;
 	public int tempoEspera;
 
-	private LocalDateTime tempoRespostaInicio;
-	public int tempoResposta;
+	private LocalDateTime tempoRetornoInicio;
+	public int tempoRetorno;
 
 	public PCB( Operacao[] codigo) {
 		this.idProcesso = processosfeitos;
@@ -34,8 +34,8 @@ public abstract class PCB implements Comparator<PCB> {
 		this.proximoChute = 5;
 		this.operacoesFeitas = 0;
 		this.tempoEspera = 0;
-		this.tempoRespostaInicio = LocalDateTime.now();
-		this.tempoResposta = 0;
+		this.tempoRetornoInicio = LocalDateTime.now();
+		this.tempoRetorno = 0;
 		processosfeitos++;
 	}
 
@@ -49,8 +49,8 @@ public abstract class PCB implements Comparator<PCB> {
 		}
 
 		if(estado.equals(Estado.TERMINADO)){
-			int delta = (int) tempoRespostaInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
-			this.tempoResposta += delta;
+			int delta = (int) tempoRetornoInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
+			this.tempoRetorno += delta;
 		}
 
 		this.estado = estado;
