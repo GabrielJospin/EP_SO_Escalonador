@@ -13,6 +13,7 @@ public class SeuSO extends SO {
 	List<PCB> processos;
 
 	//Variaveis de Tempo
+	//TODO Parte de Tempo
 	private int quantidadeDeProcessos;
 	private Long tempoEsperaTotal; //Valor em ms
 	private Long tempoRespostaTotal; // Valor em ms
@@ -106,6 +107,8 @@ public class SeuSO extends SO {
 		pcbProximo.estado = PCB.Estado.EXECUTANDO;
 		processos.set(idAtual, pcbAtual);
 		processos.set(idProximo, pcbProximo);
+
+		trocasDeProcesso++;
 	}
 
 	@Override
@@ -134,6 +137,8 @@ public class SeuSO extends SO {
 		gerateLists();
 
 		for( PCB processo: processos){
+			if(processo.codigo.length == processo.operacoesFeitas)
+				return null;
 			Operacao op =  processo.codigo[processo.operacoesFeitas];
 			if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
 				return processo;
