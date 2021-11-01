@@ -124,6 +124,8 @@ public class SeuSO extends SO {
 
 		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
 			return null;
+		if(!processo.estado.equals(PCB.Estado.ESPERANDO))
+			processo.updateEstado(PCB.Estado.ESPERANDO);
 
 		Operacao op = processo.codigo[processo.operacoesFeitas];
 		if(!( op instanceof OperacaoES))
@@ -158,8 +160,11 @@ public class SeuSO extends SO {
 
 			if(answer instanceof OperacaoES){
 				for(PCB processo: processos){
-					if(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES)){
-						return processo.codigo[processo.operacoesFeitas];
+					if(processo.operacoesFeitas < processo.codigo.length
+							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES))){
+						answer = processo.codigo[processo.operacoesFeitas];
+						processo.operacoesFeitas++;
+						return answer;
 					}
 				}
 				return null;
@@ -190,13 +195,13 @@ public class SeuSO extends SO {
 			}else{
 				Operacao op = pcb.codigo[pcb.operacoesFeitas];
 				if(op instanceof OperacaoES) {
-					if(pcb.codigo == processos.get(0).codigo){
-						pcb.updateEstado(PCB.Estado.ESPERANDO);
-					}
 					if(((OperacaoES) op).ciclos == 0 ) {
 						pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						pcb.operacoesFeitas += 1;
+					}else if(pcb.codigo == processos.get(0).codigo){
+						pcb.updateEstado(PCB.Estado.ESPERANDO);
 					}
+
 				}
 				else {
 					if(pcb.estado.equals(PCB.Estado.NOVO)){
