@@ -262,6 +262,7 @@ public class SeuSO extends SO {
 	@Override
 	protected List<Integer> idProcessosProntos() {
 		gerateLists();
+		processosProntos.sort(Comparator.comparingInt(o -> o));
 		return this.processosProntos;
 	}
 
@@ -273,6 +274,7 @@ public class SeuSO extends SO {
 	@Override
 	protected List<Integer> idProcessosEsperando() {
 		gerateLists();
+		processosEmEspera.sort(Comparator.comparingInt(o -> o));
 		return this.processosEmEspera;
 	}
 
