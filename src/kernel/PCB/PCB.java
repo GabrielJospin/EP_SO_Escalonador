@@ -18,6 +18,7 @@ public abstract class PCB implements Comparator<PCB> {
 	public int proximoChute;
 	public static int processosfeitos = 0;
 	public int operacoesFeitas;
+	public int ciclosExecutando;
 
 	private LocalDateTime tempoEsperaInicio;
 	public int tempoEspera;
@@ -36,6 +37,7 @@ public abstract class PCB implements Comparator<PCB> {
 		this.tempoEspera = 0;
 		this.tempoRetornoInicio = LocalDateTime.now();
 		this.tempoRetorno = 0;
+		this.ciclosExecutando = 0;
 		processosfeitos++;
 	}
 

@@ -30,7 +30,6 @@ public class SeuSO extends SO {
 	int idProcessoNovo;
 	int indiceOperacao;
 
-
 	public SeuSO() {
 
 		PCB.processosfeitos = 0;
@@ -137,6 +136,7 @@ public class SeuSO extends SO {
 		if(!( op instanceof OperacaoES))
 			return null;
 
+		processo.ciclosExecutando++;
 		return (OperacaoES) op;
 
 	}
@@ -171,6 +171,7 @@ public class SeuSO extends SO {
 						processo.operacoesFeitas++;
 						processo.updateEstado(PCB.Estado.EXECUTANDO);
 						this.idProcessoAtual = processo.idProcesso;
+						PCBatual.ciclosExecutando++;
 						return answer;
 					}
 				}
@@ -181,6 +182,7 @@ public class SeuSO extends SO {
 				this.idProcessoAtual = PCBatual.idProcesso;
 			}
 			processos.set(local, PCBatual);
+			PCBatual.ciclosExecutando ++;
 			PCBatual.operacoesFeitas++;
 			return answer;
 		} 
