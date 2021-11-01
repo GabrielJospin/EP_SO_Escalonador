@@ -53,6 +53,7 @@ public abstract class PCB implements Comparator<PCB> {
 			this.tempoRetorno += delta;
 		}
 
+
 		this.estado = estado;
 	}
 

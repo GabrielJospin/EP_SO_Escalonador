@@ -108,6 +108,7 @@ public class SeuSO extends SO {
 			pcbAtual.updateEstado(PCB.Estado.PRONTO);
 
 		pcbAtual.updateEstado(PCB.Estado.EXECUTANDO);
+		this.idProcessoAtual = pcbAtual.idProcesso;
 		processos.set(idAtual, pcbAtual);
 		processos.set(idProximo, pcbProximo);
 
@@ -140,11 +141,11 @@ public class SeuSO extends SO {
 		gerateLists();
 
 		for( PCB processo: processos){
-			if(processo.codigo.length == processo.operacoesFeitas)
-				return null;
-			Operacao op =  processo.codigo[processo.operacoesFeitas];
-			if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
-				return processo;
+			if(! (processo.codigo.length == processo.operacoesFeitas)){
+				Operacao op =  processo.codigo[processo.operacoesFeitas];
+				if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+					return processo;
+			}
 		}
 		return null;
 	}
@@ -155,7 +156,6 @@ public class SeuSO extends SO {
 		if(PCBatual != null && PCBatual.operacoesFeitas  < (PCBatual.codigo.length )){
 			int pos = PCBatual.operacoesFeitas;
 			int local = processos.indexOf(PCBatual);
-			processos.set(local, PCBatual);
 			Operacao answer = PCBatual.codigo[pos];
 
 			if(answer instanceof OperacaoES){
@@ -164,12 +164,18 @@ public class SeuSO extends SO {
 							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES))){
 						answer = processo.codigo[processo.operacoesFeitas];
 						processo.operacoesFeitas++;
+						processo.updateEstado(PCB.Estado.EXECUTANDO);
+						this.idProcessoAtual = processo.idProcesso;
 						return answer;
 					}
 				}
 				return null;
 			}
-
+			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO)){
+				PCBatual.updateEstado(PCB.Estado.EXECUTANDO);
+				this.idProcessoAtual = PCBatual.idProcesso;
+			}
+			processos.set(local, PCBatual);
 			PCBatual.operacoesFeitas++;
 			return answer;
 		} 
@@ -200,6 +206,7 @@ public class SeuSO extends SO {
 						pcb.operacoesFeitas += 1;
 					}else if(pcb.codigo == processos.get(0).codigo){
 						pcb.updateEstado(PCB.Estado.ESPERANDO);
+						processosEmEspera.add(pcb.idProcesso);
 					}
 
 				}
@@ -260,7 +267,6 @@ public class SeuSO extends SO {
 
 	@Override
 	protected Integer idProcessoExecutando() {
-		gerateLists();
 		return this.idProcessoAtual;
 	}
 
