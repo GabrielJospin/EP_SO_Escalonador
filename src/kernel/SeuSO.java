@@ -98,17 +98,22 @@ public class SeuSO extends SO {
 	protected void trocaContexto(PCB pcbAtual, PCB pcbProximo) {
 		int idAtual = processos.indexOf(pcbAtual);
 		int idProximo = processos.indexOf(pcbProximo);
+		if(pcbProximo.estado.equals(PCB.Estado.ESPERANDO)){
+			return;
+		}
 
-		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length)
+		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length) {
 			pcbAtual.updateEstado(PCB.Estado.TERMINADO);
+			trocasDeProcesso--;
+		}
 		else if((pcbAtual.codigo[pcbAtual.operacoesFeitas] instanceof OperacaoES)) {
 			pcbAtual.updateEstado(PCB.Estado.ESPERANDO);
 		}
 		else
 			pcbAtual.updateEstado(PCB.Estado.PRONTO);
 
-		pcbAtual.updateEstado(PCB.Estado.EXECUTANDO);
-		this.idProcessoAtual = pcbAtual.idProcesso;
+		pcbProximo.updateEstado(PCB.Estado.EXECUTANDO);
+		this.idProcessoAtual = pcbProximo.idProcesso;
 		processos.set(idAtual, pcbAtual);
 		processos.set(idProximo, pcbProximo);
 
@@ -280,6 +285,8 @@ public class SeuSO extends SO {
 
 	@Override
 	protected List<Integer> idProcessosTerminados() {
+		gerateLists();
+		processosTerminados.sort(Comparator.comparingInt(o -> o));
 		return this.processosTerminados;
 	}
 

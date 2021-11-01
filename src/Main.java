@@ -15,6 +15,7 @@ public class Main {
 		 escalonadores.add(SO.Escalonador.ROUND_ROBIN_QUANTUM_5);
 		
 		for(Escalonador esc : escalonadores) {
+			System.out.printf("Executando escalonator %s", esc.toString());
 			SO so = new SeuSO();
 			so.defineEscalonador(esc);
 			so.leArquivoEntrada(args[0]);

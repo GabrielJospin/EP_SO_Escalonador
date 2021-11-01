@@ -18,7 +18,7 @@ public class PCB_SJF extends PCB{
         if(!(o1 instanceof PCB_SJF) || !(o2 instanceof PCB_SJF) )
             throw new RuntimeException("Objetos não comparaveis");
 
-        int answer = (int) (((PCB_SJF) o1).proxChuteBurstCPU - ((PCB_SJF) o2).proxChuteBurstCPU);
+        int answer = ((PCB_SJF) o1).proxChuteBurstCPU - ((PCB_SJF) o2).proxChuteBurstCPU;
 
         return answer != 0 ? answer : o1.idProcesso - o2.idProcesso;
     }
