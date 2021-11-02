@@ -5,12 +5,12 @@ import operacoes.Operacao;
 public class PCB_SRTF extends PCB{
 
 
-    public PCB_SRTF(Operacao[] codigo) {
-        super(codigo);
+    public PCB_SRTF(Operacao[] codigo, int cicloEntrada) {
+        super(codigo, cicloEntrada);
     }
 
     public long getProcessosFaltantes() {
-        return super.proximoChute - super.operacoesFeitas;
+        return super.proximoChute - super.ciclosExecutando;
     }
 
     @Override
@@ -20,6 +20,6 @@ public class PCB_SRTF extends PCB{
 
         int answer = (int) (((PCB_SRTF) o1).getProcessosFaltantes() - ((PCB_SRTF) o2).getProcessosFaltantes());
 
-        return answer != 0 ? answer : o1.idProcesso - o2.idProcesso;
+        return answer != 0 ? answer : o1.cicloEntrada - o2.cicloEntrada;
     }
 }

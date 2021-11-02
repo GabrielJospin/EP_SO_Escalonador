@@ -29,6 +29,7 @@ public class SeuSO extends SO {
 	int idProcessoAtual;
 	int idProcessoNovo;
 	int indiceOperacao;
+	int ciclo;
 
 	public SeuSO() {
 
@@ -49,6 +50,7 @@ public class SeuSO extends SO {
 		this.processosProntos = new LinkedList<>();
 		this.idProcessoAtual = 0;
 		this.indiceOperacao = -1;
+		this.ciclo = 0;
 		}
 
 	@Override
@@ -70,24 +72,24 @@ public class SeuSO extends SO {
     }
 
 	private void criaProcessoSJF(Operacao[] codigo) {
-		PCB_SJF processo = new PCB_SJF(codigo, 5);
+		PCB_SJF processo = new PCB_SJF(codigo,ciclo ,5);
 		processos.add(processo);
 		processos.sort(processo);
 	}
 
 	private void criaProcessoRR(Operacao[] codigo) {
-		PCB_RR processo = new PCB_RR(codigo);
+		PCB_RR processo = new PCB_RR(codigo, ciclo);
 		processos.add(processo);
 		processos.sort(processo);
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
-		PCB_SRTF processo = new PCB_SRTF(codigo);
+		PCB_SRTF processo = new PCB_SRTF(codigo, ciclo);
 		processos.add(processo);
 		processos.sort(processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB_FCFS processo = new PCB_FCFS(codigo);
+		PCB_FCFS processo = new PCB_FCFS(codigo, ciclo);
 		processos.add(processo);
 		processos.sort(processo);
 	}
@@ -194,6 +196,7 @@ public class SeuSO extends SO {
 
 	@Override
 	protected void executaCicloKernel() {
+		this.ciclo++;
 		gerateLists();
 		boolean temNovosTerminados = false;
 		List<PCB> terminadosList = new ArrayList<>();

@@ -7,8 +7,8 @@ public class PCB_SJF extends PCB{
     long processosFaltantes;
     public int proxChuteBurstCPU;
 
-    public PCB_SJF(Operacao[] codigo, int proxChuteBurstCPU) {
-        super(codigo);
+    public PCB_SJF(Operacao[] codigo,int cicloEntrada, int proxChuteBurstCPU) {
+        super(codigo,cicloEntrada);
         this.processosFaltantes = codigo.length;
         this.proxChuteBurstCPU = proxChuteBurstCPU;
     }
@@ -20,6 +20,6 @@ public class PCB_SJF extends PCB{
 
         int answer = ((PCB_SJF) o1).proxChuteBurstCPU - ((PCB_SJF) o2).proxChuteBurstCPU;
 
-        return answer != 0 ? answer : o1.idProcesso - o2.idProcesso;
+        return answer != 0 ? answer : o1.cicloEntrada - o2.cicloEntrada;
     }
 }
