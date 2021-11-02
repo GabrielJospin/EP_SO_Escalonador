@@ -10,7 +10,7 @@ public class PCB_SRTF extends PCB{
     }
 
     public long getProcessosFaltantes() {
-        return super.codigo.length - super.operacoesFeitas;
+        return super.proximoChute - super.operacoesFeitas;
     }
 
     @Override

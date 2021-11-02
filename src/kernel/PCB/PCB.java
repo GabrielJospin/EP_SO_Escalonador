@@ -53,6 +53,8 @@ public abstract class PCB implements Comparator<PCB> {
 		if(estado.equals(Estado.TERMINADO)){
 			int delta = (int) tempoRetornoInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
 			this.tempoRetorno += delta;
+			if(this instanceof PCB_SRTF)
+				this.proximoChute = (proximoChute+this.ciclosExecutando)/2;
 		}
 
 
