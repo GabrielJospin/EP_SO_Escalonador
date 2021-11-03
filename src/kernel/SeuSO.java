@@ -2,6 +2,7 @@ package kernel;
 import java.util.*;
 
 import kernel.PCB.*;
+import kernel.PCB.PCB.Estado;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
 
@@ -48,7 +49,7 @@ public class SeuSO extends SO {
 		this.processosPausados  = new LinkedList<>();
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
-		this.idProcessoAtual = 0;
+		this.idProcessoAtual = -1;
 		this.indiceOperacao = -1;
 		this.ciclo = 0;
 		}
@@ -89,7 +90,7 @@ public class SeuSO extends SO {
 		processos.sort(processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB_FCFS processo = new PCB_FCFS(codigo, ciclo);
+		PCB_FCFS processo = new PCB_FCFS(codigo, this.ciclo);
 		processos.add(processo);
 		processos.sort(processo);
 	}
@@ -133,7 +134,6 @@ public class SeuSO extends SO {
 			return null;
 		if(!processo.estado.equals(PCB.Estado.ESPERANDO))
 			processo.updateEstado(PCB.Estado.ESPERANDO);
-
 		Operacao op = processo.codigo[processo.operacoesFeitas];
 		if(!( op instanceof OperacaoES))
 			return null;
@@ -148,7 +148,7 @@ public class SeuSO extends SO {
 		gerateLists();
 
 		for( PCB processo: processos){
-			if(! (processo.codigo.length == processo.operacoesFeitas)){
+			if(! (processo.codigo.length == processo.operacoesFeitas) && (processo.idProcesso != this.ciclo - 1)){
 				Operacao op =  processo.codigo[processo.operacoesFeitas];
 				if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
 					return processo;
@@ -160,7 +160,7 @@ public class SeuSO extends SO {
 	@Override
 	protected Operacao proximaOperacaoCPU() {
 		PCB PCBatual = getPCBAtual();
-		if(PCBatual != null && PCBatual.operacoesFeitas  < (PCBatual.codigo.length )){
+		if((PCBatual != null) && (PCBatual.operacoesFeitas  < PCBatual.codigo.length) && !(PCBatual.estado.equals(Estado.NOVO))){
 			int pos = PCBatual.operacoesFeitas;
 			int local = processos.indexOf(PCBatual);
 			Operacao answer = PCBatual.codigo[pos];
@@ -168,7 +168,7 @@ public class SeuSO extends SO {
 			if(answer instanceof OperacaoES){
 				for(PCB processo: processos){
 					if(processo.operacoesFeitas < processo.codigo.length
-							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES))){
+							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES) && !(processo.estado.equals(Estado.NOVO)))){
 						answer = processo.codigo[processo.operacoesFeitas];
 						processo.operacoesFeitas++;
 						processo.updateEstado(PCB.Estado.EXECUTANDO);
@@ -200,30 +200,30 @@ public class SeuSO extends SO {
 		gerateLists();
 		boolean temNovosTerminados = false;
 		List<PCB> terminadosList = new ArrayList<>();
-
+		
 		for(PCB pcb: processos){
-
-
 			if(pcb.operacoesFeitas == pcb.codigo.length) {
 				pcb.updateEstado(PCB.Estado.TERMINADO);
 				temNovosTerminados = true;
 				terminadosList.add(pcb);
 			}else{
+				if(pcb.estado.equals(PCB.Estado.NOVO) && (pcb.idProcesso == this.ciclo - 1)){
+					continue;
+				}
 				Operacao op = pcb.codigo[pcb.operacoesFeitas];
 				if(op instanceof OperacaoES) {
-					if(((OperacaoES) op).ciclos == 0 ) {
+					if(((OperacaoES) op).ciclos == 0) {
 						pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						pcb.operacoesFeitas += 1;
-					}else if(pcb.codigo == processos.get(0).codigo){
+					}else {
 						pcb.updateEstado(PCB.Estado.ESPERANDO);
 						processosEmEspera.add(pcb.idProcesso);
 					}
-
 				}
 				else {
 					if(pcb.estado.equals(PCB.Estado.NOVO)){
 						pcb.updateEstado(PCB.Estado.PRONTO);
-					}if(pcb.estado.equals(PCB.Estado.PRONTO)){
+					}else if(pcb.estado.equals(PCB.Estado.PRONTO)){
 						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
 							pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						}
