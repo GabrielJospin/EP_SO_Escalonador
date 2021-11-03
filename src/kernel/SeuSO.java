@@ -2,6 +2,8 @@ package kernel;
 import java.util.*;
 
 import kernel.PCB.*;
+import operacoes.Carrega;
+
 import operacoes.Operacao;
 import operacoes.OperacaoES;
 
@@ -31,6 +33,13 @@ public class SeuSO extends SO {
 	int indiceOperacao;
 	int ciclo;
 
+
+	//SJF
+	
+	public proxChuteBurstCPU = 5;
+	
+
+
 	public SeuSO() {
 
 		PCB.processosfeitos = 0;
@@ -48,7 +57,7 @@ public class SeuSO extends SO {
 		this.processosPausados  = new LinkedList<>();
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
-		this.idProcessoAtual = 0;
+		this.idProcessoAtual = -1;
 		this.indiceOperacao = -1;
 		this.ciclo = 0;
 		}
@@ -58,10 +67,11 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
+		if(escalonador.equals(escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			criaProcessoSRTF(codigo);
-		} else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+		} else if(escalonador.equals(escalonador.FIRST_COME_FIRST_SERVED)) {
 			criaProcessoFCFS(codigo);
+
 		} else if(escalonador.equals(Escalonador.ROUND_ROBIN_QUANTUM_5)){
 			criaProcessoRR(codigo);
 		}else if(escalonador.equals(Escalonador.SHORTEST_JOB_FIRST)){
@@ -187,6 +197,7 @@ public class SeuSO extends SO {
 			PCBatual.ciclosExecutando ++;
 			PCBatual.operacoesFeitas++;
 			return answer;
+
 		} 
 		else
 			return null;
@@ -231,6 +242,7 @@ public class SeuSO extends SO {
 						if(processos.get(0).idProcesso != pcb.idProcesso)
 							trocaContexto(pcb, processos.get(0));
 				}
+
 
 			}
 
@@ -343,7 +355,6 @@ public class SeuSO extends SO {
 			if(e.estado.equals(PCB.Estado.ESPERANDO))
 				processosEmEspera.add(e.idProcesso);
 		}
-
 	}
 
 	private PCB getPCBAtual(){
