@@ -1,20 +1,22 @@
 package kernel;
 import java.util.*;
 
-import kernel.PCB.PCB;\
-import kernel.PCB.PCB_SRTF;
+import kernel.PCB.*;
 import operacoes.Carrega;
+
 import operacoes.Operacao;
 import operacoes.OperacaoES;
-import operacoes.Soma;
 
 public class SeuSO extends SO {
+
 
 	//Escalonador
 	private Escalonador escalonador;
 	List<PCB> processos;
 
 	//Variaveis de Tempo
+
+
 	private int quantidadeDeProcessos;
 	private Long tempoEsperaTotal; //Valor em ms
 	private Long tempoRespostaTotal; // Valor em ms
@@ -29,13 +31,19 @@ public class SeuSO extends SO {
 	int idProcessoAtual;
 	int idProcessoNovo;
 	int indiceOperacao;
+	int ciclo;
+
 
 	//SJF
 	
 	public proxChuteBurstCPU = 5;
 	
 
+
 	public SeuSO() {
+
+		PCB.processosfeitos = 0;
+
 		this.escalonador = null;
 		this.processos = new LinkedList<>();
 
@@ -51,6 +59,7 @@ public class SeuSO extends SO {
 		this.processosProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
 		this.indiceOperacao = -1;
+		this.ciclo = 0;
 		}
 
 	@Override
@@ -62,126 +71,208 @@ public class SeuSO extends SO {
 			criaProcessoSRTF(codigo);
 		} else if(escalonador.equals(escalonador.FIRST_COME_FIRST_SERVED)) {
 			criaProcessoFCFS(codigo);
-		} else if(escalonador.equals(escalonador.SHORTEST_JOB_FIRST)) {
-			criaProcessoSJF(codigo, proxChuteBurstCPU);
-		}
+
+		} else if(escalonador.equals(Escalonador.ROUND_ROBIN_QUANTUM_5)){
+			criaProcessoRR(codigo);
+		}else if(escalonador.equals(Escalonador.SHORTEST_JOB_FIRST)){
+			criaProcessoSJF(codigo);
+		}else
+			throw new RuntimeException("Escalonador não identificado");
+	    quantidadeDeProcessos++;
+    }
+
+	private void criaProcessoSJF(Operacao[] codigo) {
+		PCB_SJF processo = new PCB_SJF(codigo,ciclo ,5);
+		processos.add(processo);
+		processos.sort(processo);
+	}
+
+	private void criaProcessoRR(Operacao[] codigo) {
+		PCB_RR processo = new PCB_RR(codigo, ciclo);
+		processos.add(processo);
+		processos.sort(processo);
 	}
 
 	private void criaProcessoSRTF(Operacao[] codigo){
-		PCB_SRTF processo = new PCB_SRTF(codigo);
-		processo.estado = PCB.Estado.ESPERANDO;
+		PCB_SRTF processo = new PCB_SRTF(codigo, ciclo);
 		processos.add(processo);
-		Collections.sort(processos, processo);
+		processos.sort(processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB_FCFS processo = new PCB_FCFS(codigo);
+		PCB_FCFS processo = new PCB_FCFS(codigo, ciclo);
 		processos.add(processo);
-		Collections.sort(processos, processo);
-	}
-	private void criaProcessoSJF(Operacao[] codigo, int proxChuteBurstCPU){
-		PCB_SJF processo = new PCB_SJF(codigo, proxChuteBurstCPU);
-		processos.add(processo);
-		Collections.sort(processos, processo);
+		processos.sort(processo);
 	}
 
 
 	@Override
 	protected void trocaContexto(PCB pcbAtual, PCB pcbProximo) {
-		// TODO Auto-generated method stub
+		int idAtual = processos.indexOf(pcbAtual);
+		int idProximo = processos.indexOf(pcbProximo);
+		if(pcbProximo.estado.equals(PCB.Estado.ESPERANDO)){
+			return;
+		}
+
+		if(pcbAtual.operacoesFeitas == pcbAtual.codigo.length) {
+			pcbAtual.updateEstado(PCB.Estado.TERMINADO);
+			trocasDeProcesso--;
+		}
+		else if((pcbAtual.codigo[pcbAtual.operacoesFeitas] instanceof OperacaoES)) {
+			pcbAtual.updateEstado(PCB.Estado.ESPERANDO);
+		}
+		else
+			pcbAtual.updateEstado(PCB.Estado.PRONTO);
+
+		pcbProximo.updateEstado(PCB.Estado.EXECUTANDO);
+		this.idProcessoAtual = pcbProximo.idProcesso;
+		processos.set(idAtual, pcbAtual);
+		processos.set(idProximo, pcbProximo);
+
+		trocasDeProcesso++;
 	}
 
 	@Override
 	// Assuma que 0 <= idDispositivo <= 4
 	protected OperacaoES proximaOperacaoES(int idDispositivo) {
-		// TODO Auto-generated method stub
+		if(idProcessosEsperando().size() == 0)
+			return null;
+
+		PCB processo = getPCBespera(idDispositivo);
+
+		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
+			return null;
+		if(!processo.estado.equals(PCB.Estado.ESPERANDO))
+			processo.updateEstado(PCB.Estado.ESPERANDO);
+
+		Operacao op = processo.codigo[processo.operacoesFeitas];
+		if(!( op instanceof OperacaoES))
+			return null;
+
+		processo.ciclosExecutando++;
+		return (OperacaoES) op;
+
+	}
+
+	private PCB getPCBespera(int idDispositivo) {
+
+		gerateLists();
+
+		for( PCB processo: processos){
+			if(! (processo.codigo.length == processo.operacoesFeitas)){
+				Operacao op =  processo.codigo[processo.operacoesFeitas];
+				if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+					return processo;
+			}
+		}
 		return null;
 	}
 
 	@Override
 	protected Operacao proximaOperacaoCPU() {
-		// TODO Auto-generated method stub
 		PCB PCBatual = getPCBAtual();
-		if(PCBatual.operacoesFeitas + 1 < (PCBatual.codigo.length - 1)){
-			if(PCBatual instanceof PCB_SJF) {
-				PCBAtual.contadorBurst++;
+		if(PCBatual != null && PCBatual.operacoesFeitas  < (PCBatual.codigo.length )){
+			int pos = PCBatual.operacoesFeitas;
+			int local = processos.indexOf(PCBatual);
+			Operacao answer = PCBatual.codigo[pos];
+
+			if(answer instanceof OperacaoES){
+				for(PCB processo: processos){
+					if(processo.operacoesFeitas < processo.codigo.length
+							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES))){
+						answer = processo.codigo[processo.operacoesFeitas];
+						processo.operacoesFeitas++;
+						processo.updateEstado(PCB.Estado.EXECUTANDO);
+						this.idProcessoAtual = processo.idProcesso;
+						PCBatual.ciclosExecutando++;
+						return answer;
+					}
+				}
+				return null;
 			}
-			return PCBAtual.codigo[PCBatual.operacoesFeitas];
+			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO)){
+				PCBatual.updateEstado(PCB.Estado.EXECUTANDO);
+				this.idProcessoAtual = PCBatual.idProcesso;
+			}
+			processos.set(local, PCBatual);
+			PCBatual.ciclosExecutando ++;
+			PCBatual.operacoesFeitas++;
+			return answer;
+
 		} 
 		else
 			return null;
+
+
 	}
 
 	@Override
 	protected void executaCicloKernel() {
-		PCB PCBatual = getPCBAtual();
-
+		this.ciclo++;
 		gerateLists();
-		if(escalonador.equals(escalonador.SHORTEST_REMANING_TIME_FIRST)){
-			if(idProcessoAtual != processos.get(0).idProcesso){
+		boolean temNovosTerminados = false;
+		List<PCB> terminadosList = new ArrayList<>();
 
-				if (PCBatual.operacoesFeitas == PCBatual.codigo.length)
-					PCBatual.estado = PCB.Estado.TERMINADO;
-				else
-					PCBatual.estado = PCB.Estado.ESPERANDO;
+		for(PCB pcb: processos){
 
-				PCB PCBproximo = processos.get(0);
-				trocaContexto(PCBatual, PCBproximo);
-				return;
+
+			if(pcb.operacoesFeitas == pcb.codigo.length) {
+				pcb.updateEstado(PCB.Estado.TERMINADO);
+				temNovosTerminados = true;
+				terminadosList.add(pcb);
+			}else{
+				Operacao op = pcb.codigo[pcb.operacoesFeitas];
+				if(op instanceof OperacaoES) {
+					if(((OperacaoES) op).ciclos == 0 ) {
+						pcb.updateEstado(PCB.Estado.EXECUTANDO);
+						pcb.operacoesFeitas += 1;
+					}else if(pcb.codigo == processos.get(0).codigo){
+						pcb.updateEstado(PCB.Estado.ESPERANDO);
+						processosEmEspera.add(pcb.idProcesso);
+					}
+
+				}
+				else {
+					if(pcb.estado.equals(PCB.Estado.NOVO)){
+						pcb.updateEstado(PCB.Estado.PRONTO);
+					}if(pcb.estado.equals(PCB.Estado.PRONTO)){
+						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
+							pcb.updateEstado(PCB.Estado.EXECUTANDO);
+						}
+					}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
+						if(processos.get(0).idProcesso != pcb.idProcesso)
+							trocaContexto(pcb, processos.get(0));
+				}
+
+
 			}
 
-			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
-				PCBatual.estado = PCB.Estado.PRONTO;
-				return;
-			}
-
-			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
-				PCBatual.estado = PCB.Estado.EXECUTANDO;
-
-			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
-			executaOperacao(operacaoAtual, PCBatual);
-			PCBatual.operacoesFeitas++;
+			processos.set(processos.indexOf(pcb), pcb);
 		}
-		else if(escalonador.equals(escalonador.FIRST_COME_FIRST_SERVED)) {
-			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
-				PCBatual.estado = PCB.Estado.PRONTO;
-				return;
+		if(temNovosTerminados){
+			for(PCB processo : terminadosList){
+				if(processo.estado.equals(PCB.Estado.TERMINADO)) {
+					processos.remove(processo);
+					processosTerminados.add(processo.idProcesso);
+					tempoRetornoTotal += processo.tempoRetorno;
+					tempoEsperaTotal += processo.tempoEspera;
+					tempoRespostaTotal += processo.getTempoResposta();
+				}
 			}
-			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
-				PCBatual.estado = PCB.Estado.EXECUTANDO;
-			
-			if (PCBatual.operacoesFeitas == PCBatual.codigo.length) {
-				PCBatual.estado = PCB.Estado.TERMINADO;
-			}				
-			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
-			executaOperacao(operacaoAtual, PCBatual);
-			PCBatual.operacoesFeitas++;
-			
-
 		}
-		else if(escalonador.equals(escalonador.SHORTEST_JOB_FIRST)) {
-			if(PCBatual.estado.equals(PCB.Estado.NOVO)){
-				PCBatual.estado = PCB.Estado.PRONTO;
-				return;
-			}
-			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO))
-				PCBatual.estado = PCB.Estado.EXECUTANDO;
-			
-			if (PCBatual.operacoesFeitas == PCBatual.codigo.length) {
-				PCBatual.estado = PCB.Estado.TERMINADO;
-				this.proxChuteBurstCPU = (PCBatual.proxChuteBurstCPU + PCBatual.contadorBurst)/2;
-			}				
-			Operacao operacaoAtual = PCBatual.codigo[PCBatual.operacoesFeitas];
-			executaOperacao(operacaoAtual, PCBatual);
-			PCBatual.operacoesFeitas++;
-			
+		gerateLists();
 
-		}
+	}
 
-	} 
+	private boolean cpuExecutando() {
+		PCB PCBAtual = getPCBAtual();
+		assert PCBAtual != null;
+		return PCBAtual.idProcesso == this.idProcessoAtual;
+	}
 
 	@Override
 	protected boolean temTarefasPendentes() {
-		return this.processosEmEspera.isEmpty();
+
+		return processos.size() != 0;
 	}
 
 	@Override
@@ -193,23 +284,26 @@ public class SeuSO extends SO {
 	@Override
 	protected List<Integer> idProcessosProntos() {
 		gerateLists();
+		processosProntos.sort(Comparator.comparingInt(o -> o));
 		return this.processosProntos;
 	}
 
 	@Override
 	protected Integer idProcessoExecutando() {
-		gerateLists();
 		return this.idProcessoAtual;
 	}
 
 	@Override
 	protected List<Integer> idProcessosEsperando() {
 		gerateLists();
+		processosEmEspera.sort(Comparator.comparingInt(o -> o));
 		return this.processosEmEspera;
 	}
 
 	@Override
 	protected List<Integer> idProcessosTerminados() {
+		gerateLists();
+		processosTerminados.sort(Comparator.comparingInt(o -> o));
 		return this.processosTerminados;
 	}
 
@@ -225,7 +319,6 @@ public class SeuSO extends SO {
 	protected int tempoRespostaMedio() {
 		if(quantidadeDeProcessos == 0)
 			return -1;
-
 		return (int) (tempoRespostaTotal/quantidadeDeProcessos);
 	}
 
@@ -239,7 +332,7 @@ public class SeuSO extends SO {
 
 	@Override
 	protected int trocasContexto() {
-		return this.trocasDeProcesso;
+		return this.trocasDeProcesso/quantidadeDeProcessos;
 	}
 
 	@Override
@@ -248,7 +341,11 @@ public class SeuSO extends SO {
 	}
 
 	private void gerateLists(){
-		processos.forEach(e ->{
+
+		processosProntos = new LinkedList<>();
+		processosEmEspera = new LinkedList<>();
+
+		for(PCB e: processos){
 			if(e.estado.equals(PCB.Estado.NOVO))
 				idProcessoNovo = e.idProcesso;
 			if(e.estado.equals(PCB.Estado.PRONTO))
@@ -257,44 +354,11 @@ public class SeuSO extends SO {
 				idProcessoAtual = e.idProcesso;
 			if(e.estado.equals(PCB.Estado.ESPERANDO))
 				processosEmEspera.add(e.idProcesso);
-			if(e.estado.equals(PCB.Estado.TERMINADO))
-				processosTerminados.add(e.idProcesso);
-		});
+		}
 	}
 
 	private PCB getPCBAtual(){
-		for (PCB processo : processos)
-			if (processo.idProcesso == idProcessoAtual)
-				return processo;
-
-		throw new RuntimeException("PCb atual nulo");
+		return processos.size() != 0 ?  processos.get(0): null;
 	}
 
-	private static void executaOperacao(Operacao operacao, PCB pcb){
-		if(operacao instanceof Soma)
-			excutaSoma((Soma) operacao, pcb);
-		if(operacao instanceof Carrega)
-			executaCarrega((Carrega) operacao, pcb);
-		if(operacao instanceof OperacaoES)
-			executaOperacaoES((OperacaoES) operacao, pcb);
-		else
-			throw new RuntimeException("Operador Inválido");
-
-		pcb.contadorDePrograma++;
-	}
-
-	private static void executaOperacaoES(OperacaoES operacaoES, PCB pcb) {
-		//TODO Operação ES
-	}
-
-	private static void executaCarrega(Carrega carrega, PCB pcb) {
-		pcb.registradores[carrega.registrador] = carrega.valor;
-	}
-
-	private static void excutaSoma(Soma soma, PCB pcb) {
-		int parcela1 = pcb.registradores[soma.registradorParcela1];
-		int parcela2 = pcb.registradores[soma.registradorParcela2];
-		int result = parcela1 + parcela2;
-		pcb.registradores[soma.registradorTotal] = result;
-	}
 }

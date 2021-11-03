@@ -5,8 +5,8 @@ import operacoes.Operacao;
 public class PCB_FCFS extends PCB{
 
 
-    public PCB_FCFS(Operacao[] codigo) {
-        super(codigo);
+    public PCB_FCFS(Operacao[] codigo, int cicloEntrada) {
+        super(codigo, cicloEntrada);
     }
 
 
@@ -15,8 +15,6 @@ public class PCB_FCFS extends PCB{
         if(!(o1 instanceof PCB_FCFS) || !(o2 instanceof PCB_FCFS) )
             throw new RuntimeException("Objetos não comparaveis");
 
-        int answer = (int) (((PCB_FCFS) o1).idProcesso - ((PCB_FCFS) o2).idProcesso);
-
-        return answer;
+        return o1.cicloEntrada - o2.cicloEntrada;
     }
 }

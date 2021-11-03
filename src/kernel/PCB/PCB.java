@@ -1,6 +1,8 @@
 package kernel.PCB;
 import operacoes.Operacao;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 
 //Freire comunista confirmado
@@ -16,8 +18,16 @@ public abstract class PCB implements Comparator<PCB> {
 	public int proximoChute;
 	public static int processosfeitos = 0;
 	public int operacoesFeitas;
+	public int ciclosExecutando;
+	public int cicloEntrada;
 
-	public PCB( Operacao[] codigo) {
+	private LocalDateTime tempoEsperaInicio;
+	public int tempoEspera;
+
+	private LocalDateTime tempoRetornoInicio;
+	public int tempoRetorno;
+
+	public PCB( Operacao[] codigo, int cicloEntrada) {
 		this.idProcesso = processosfeitos;
 		this.estado = Estado.NOVO;
 		this.registradores = new int[5];
@@ -25,7 +35,38 @@ public abstract class PCB implements Comparator<PCB> {
 		this.codigo = codigo;
 		this.proximoChute = 5;
 		this.operacoesFeitas = 0;
+		this.tempoEspera = 0;
+		this.tempoRetornoInicio = LocalDateTime.now();
+		this.tempoRetorno = 0;
+		this.ciclosExecutando = 0;
+		this.cicloEntrada = cicloEntrada;
 		processosfeitos++;
+	}
+
+	public void updateEstado(Estado estado){
+		if(estado.equals(Estado.PRONTO))
+			this.tempoEsperaInicio = LocalDateTime.now();
+
+		if(this.estado.equals(Estado.PRONTO)){
+			int delta = (int) tempoEsperaInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
+			this.tempoEspera += delta;
+		}
+
+		if(estado.equals(Estado.TERMINADO)){
+			int delta = (int) tempoRetornoInicio.until(LocalDateTime.now(), ChronoUnit.MICROS);
+			this.tempoRetorno += delta;
+			if(this instanceof PCB_SRTF)
+				this.proximoChute = (proximoChute+this.ciclosExecutando)/2;
+		}
+
+
+		this.estado = estado;
+	}
+
+	public  int getTempoResposta(){
+		if(operacoesFeitas > 0)
+			return (tempoRetorno - tempoEspera)/operacoesFeitas;
+		return -1;
 	}
 
 	@Override
