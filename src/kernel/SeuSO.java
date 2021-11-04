@@ -27,6 +27,8 @@ public class SeuSO extends SO {
 	List<Integer> processosPausados;
 	List<Integer> processosEmEspera;
 	List<Integer> processosProntos;
+	List<Integer> filaProntos;
+	List<Integer> filaEsperando;
 	int idProcessoAtual;
 	int idProcessoNovo;
 	int indiceOperacao;
@@ -49,6 +51,8 @@ public class SeuSO extends SO {
 		this.processosPausados  = new LinkedList<>();
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
+		this.filaEsperando = new LinkedList<>();
+		this.filaProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
 		this.indiceOperacao = -1;
 		this.ciclo = 0;
@@ -132,8 +136,10 @@ public class SeuSO extends SO {
 
 		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
 			return null;
-		if(!processo.estado.equals(PCB.Estado.ESPERANDO))
+		if(!processo.estado.equals(PCB.Estado.ESPERANDO)) {
 			processo.updateEstado(PCB.Estado.ESPERANDO);
+			System.out.println("\n" + processo.idProcesso);
+		}
 		Operacao op = processo.codigo[processo.operacoesFeitas];
 		if(!( op instanceof OperacaoES))
 			return null;
@@ -149,9 +155,17 @@ public class SeuSO extends SO {
 
 		for( PCB processo: processos){
 			if(! (processo.codigo.length == processo.operacoesFeitas) && (processo.idProcesso != this.ciclo - 1)){
-				Operacao op =  processo.codigo[processo.operacoesFeitas];
-				if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
-					return processo;
+				if((processo.estado != Estado.EXECUTANDO)) {
+					if(this.escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+						Operacao op =  processo.codigo[processo.operacoesFeitas];
+						if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+							return processo;
+					}
+					Operacao op =  processo.codigo[processo.operacoesFeitas];
+					if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+						return processo;
+				}
+				
 			}
 		}
 		return null;
@@ -180,6 +194,11 @@ public class SeuSO extends SO {
 				return null;
 			}
 			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO)){
+				if(PCBatual.estado.equals(PCB.Estado.ESPERANDO)) {
+					//processosEmEspera.remove(PCBatual.idProcesso);
+					if(filaEsperando.contains(PCBatual.idProcesso))
+						filaEsperando.remove(filaEsperando.indexOf(PCBatual.idProcesso));
+				}
 				PCBatual.updateEstado(PCB.Estado.EXECUTANDO);
 				this.idProcessoAtual = PCBatual.idProcesso;
 			}
@@ -200,8 +219,10 @@ public class SeuSO extends SO {
 		gerateLists();
 		boolean temNovosTerminados = false;
 		List<PCB> terminadosList = new ArrayList<>();
-		
+		imprimirFila(this.filaProntos, "prontos");
+		imprimirFila(this.filaEsperando, "esperando");
 		for(PCB pcb: processos){
+			System.out.println("\nProcesso: " + pcb.idProcesso);
 			if(pcb.operacoesFeitas == pcb.codigo.length) {
 				pcb.updateEstado(PCB.Estado.TERMINADO);
 				temNovosTerminados = true;
@@ -212,24 +233,54 @@ public class SeuSO extends SO {
 				}
 				Operacao op = pcb.codigo[pcb.operacoesFeitas];
 				if(op instanceof OperacaoES) {
-					if(((OperacaoES) op).ciclos == 0) {
-						pcb.updateEstado(PCB.Estado.EXECUTANDO);
+					if(((OperacaoES) op).ciclos == 0) { 
+						if(pcb.operacoesFeitas + 1 < pcb.codigo.length) 
+							if(cpuExecutando()) {
+								pcb.updateEstado(PCB.Estado.PRONTO);
+								filaProntos.add(pcb.idProcesso);
+							} else if(pcb.idProcesso == filaEsperando.get(0)){
+								pcb.updateEstado(PCB.Estado.EXECUTANDO);
+								System.out.println("Executando");
+							} else {
+								filaEsperando.add(pcb.idProcesso);
+								processosEmEspera.add(pcb.idProcesso);
+							}
+							filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+							//processosEmEspera.remove(pcb.idProcesso);
+						
 						pcb.operacoesFeitas += 1;
 					}else {
 						pcb.updateEstado(PCB.Estado.ESPERANDO);
 						processosEmEspera.add(pcb.idProcesso);
+						if(!filaEsperando.contains(pcb.idProcesso))
+							filaEsperando.add(pcb.idProcesso);
+						System.out.println("\n" + pcb.idProcesso);
 					}
 				}
 				else {
 					if(pcb.estado.equals(PCB.Estado.NOVO)){
 						pcb.updateEstado(PCB.Estado.PRONTO);
-					}else if(pcb.estado.equals(PCB.Estado.PRONTO)){
-						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
+						filaProntos.add(pcb.idProcesso);
+					}
+					if(pcb.estado.equals(PCB.Estado.PRONTO)){
+						if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+							if(!cpuExecutando() && filaProntos.get(0) == pcb.idProcesso) {
+								pcb.updateEstado(PCB.Estado.EXECUTANDO);
+								filaProntos.remove(filaProntos.indexOf(pcb.idProcesso));
+							}
+						} else if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
 							pcb.updateEstado(PCB.Estado.EXECUTANDO);
-						}
-					}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
-						if(processos.get(0).idProcesso != pcb.idProcesso)
+						}	
+
+					} else if(pcb.estado.equals(PCB.Estado.EXECUTANDO)){
+						if(this.escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+							continue;
+						} else if(processos.get(0).idProcesso != pcb.idProcesso){
 							trocaContexto(pcb, processos.get(0));
+						}
+					}
+						
+							
 				}
 
 			}
@@ -251,10 +302,16 @@ public class SeuSO extends SO {
 
 	}
 
+	private void imprimirFila(List<Integer> fila, String nome) {
+		System.out.println("Imprimindo fila" + fila.toString() + nome);
+	}
+
+
 	private boolean cpuExecutando() {
-		PCB PCBAtual = getPCBAtual();
-		assert PCBAtual != null;
-		return PCBAtual.idProcesso == this.idProcessoAtual;
+		// PCB PCBAtual = getPCBAtual();
+		// assert PCBAtual != null;
+		// return PCBAtual.idProcesso == this.idProcessoAtual;
+		return this.idProcessoAtual > -1;
 	}
 
 	@Override
@@ -332,7 +389,8 @@ public class SeuSO extends SO {
 
 		processosProntos = new LinkedList<>();
 		processosEmEspera = new LinkedList<>();
-
+		idProcessoNovo = -1;
+		idProcessoAtual = -1;
 		for(PCB e: processos){
 			if(e.estado.equals(PCB.Estado.NOVO))
 				idProcessoNovo = e.idProcesso;
