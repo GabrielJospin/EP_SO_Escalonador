@@ -1,7 +1,6 @@
 package kernel;
 import java.util.*;
 
-import javax.lang.model.util.ElementScanner6;
 
 import kernel.PCB.*;
 import kernel.PCB.PCB.Estado;
@@ -257,10 +256,13 @@ public class SeuSO extends SO {
 					if(((OperacaoES) op).ciclos == 0) { 
 						if(cpuExecutando()) {
 							if((pcb.operacoesFeitas + 1) < pcb.codigo.length && !(pcb.codigo[pcb.operacoesFeitas + 1] instanceof OperacaoES)) {
+								
 								pcb.updateEstado(PCB.Estado.PRONTO);
 								if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
 									filaProntos.add(pcb.idProcesso);
 									filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+								} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST && pcb instanceof PCB_SJF) {
+									processosProntos.add(pcb.idProcesso);
 								}
 							}
 						} else if(filaEsperando.size() > 0 && pcb.idProcesso == filaEsperando.get(0)){
@@ -268,19 +270,25 @@ public class SeuSO extends SO {
 							System.out.println("Executando");
 							if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
 								filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+							} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
+								pcb.contadorBurst++;
 							}
 						} else {
 							pcb.updateEstado(PCB.Estado.ESPERANDO);
 							if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
 								if(!filaEsperando.contains(pcb.idProcesso))
 									filaEsperando.add(pcb.idProcesso);
-							}
+							} 
 							processosEmEspera.add(pcb.idProcesso);
 						}
 						pcb.operacoesFeitas += 1;
 					} else {
 						if(pcb.estado == PCB.Estado.EXECUTANDO) {
 							this.idProcessoAtual = -1;
+							if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
+								pcb.mediaExponencial();
+								pcb.contadorBurst = 0;
+							}
 						}
 						pcb.updateEstado(PCB.Estado.ESPERANDO);
 						processosEmEspera.add(pcb.idProcesso);
@@ -303,11 +311,20 @@ public class SeuSO extends SO {
 								pcb.updateEstado(PCB.Estado.EXECUTANDO);
 								filaProntos.remove(0);	
 							}
+						} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
+							pcb.contadorBurst = 0;
+							if(!cpuExecutando() && processosProntos.get(0) == pcb.idProcesso) {
+								pcb.updateEstado(PCB.Estado.EXECUTANDO);
+								processosProntos.remove(0);
+								pcb.contadorBurst++;
+							}
 						} else if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso ) {
 							pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						}
 					} else if(pcb.estado.equals(PCB.Estado.EXECUTANDO)){
 						if(this.escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+							continue;
+						} else if(this.escalonador.equals(Escalonador.SHORTEST_JOB_FIRST)) {
 							continue;
 						} else if(processos.get(0).idProcesso != pcb.idProcesso){
 							trocaContexto(pcb, processos.get(0));
@@ -340,7 +357,6 @@ public class SeuSO extends SO {
 	private void imprimirFila(List<Integer> fila, String nome) {
 		System.out.println("Imprimindo fila" + fila.toString() + nome);
 	}
-
 
 	private boolean cpuExecutando() {
 		// PCB PCBAtual = getPCBAtual();
