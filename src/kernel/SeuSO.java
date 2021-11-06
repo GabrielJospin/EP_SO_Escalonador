@@ -1,9 +1,9 @@
 package kernel;
 import java.util.*;
 
-import kernel.PCB.*;
-import operacoes.Carrega;
 
+import kernel.PCB.*;
+import kernel.PCB.PCB.Estado;
 import operacoes.Operacao;
 import operacoes.OperacaoES;
 
@@ -28,17 +28,12 @@ public class SeuSO extends SO {
 	List<Integer> processosPausados;
 	List<Integer> processosEmEspera;
 	List<Integer> processosProntos;
+	List<Integer> filaProntos;
+	List<Integer> filaEsperando;
 	int idProcessoAtual;
 	int idProcessoNovo;
 	int indiceOperacao;
 	int ciclo;
-
-
-	//SJF
-	
-	public proxChuteBurstCPU = 5;
-	
-
 
 	public SeuSO() {
 
@@ -57,6 +52,8 @@ public class SeuSO extends SO {
 		this.processosPausados  = new LinkedList<>();
 		this.processosEmEspera = new LinkedList<>();
 		this.processosProntos = new LinkedList<>();
+		this.filaEsperando = new LinkedList<>();
+		this.filaProntos = new LinkedList<>();
 		this.idProcessoAtual = -1;
 		this.indiceOperacao = -1;
 		this.ciclo = 0;
@@ -67,11 +64,10 @@ public class SeuSO extends SO {
 	// só estará "pronto" no proxime ciclo
     //Teste
 	protected void criaProcesso(Operacao[] codigo) {
-		if(escalonador.equals(escalonador.SHORTEST_REMANING_TIME_FIRST)){
+		if(escalonador.equals(Escalonador.SHORTEST_REMANING_TIME_FIRST)){
 			criaProcessoSRTF(codigo);
-		} else if(escalonador.equals(escalonador.FIRST_COME_FIRST_SERVED)) {
+		} else if(escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
 			criaProcessoFCFS(codigo);
-
 		} else if(escalonador.equals(Escalonador.ROUND_ROBIN_QUANTUM_5)){
 			criaProcessoRR(codigo);
 		}else if(escalonador.equals(Escalonador.SHORTEST_JOB_FIRST)){
@@ -99,7 +95,7 @@ public class SeuSO extends SO {
 		processos.sort(processo);
 	}
 	private void criaProcessoFCFS(Operacao[] codigo){
-		PCB_FCFS processo = new PCB_FCFS(codigo, ciclo);
+		PCB_FCFS processo = new PCB_FCFS(codigo, this.ciclo);
 		processos.add(processo);
 		processos.sort(processo);
 	}
@@ -138,12 +134,17 @@ public class SeuSO extends SO {
 			return null;
 
 		PCB processo = getPCBespera(idDispositivo);
-
+		if(processo != null)
+			System.out.println("Prox op e/s" + processo.idProcesso);
 		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
 			return null;
-		if(!processo.estado.equals(PCB.Estado.ESPERANDO))
+		if(!processo.estado.equals(PCB.Estado.ESPERANDO)) {
+			if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+				if(!this.filaEsperando.contains(processo.idProcesso))
+					this.filaEsperando.add(filaEsperando.indexOf(processo.idProcesso));
+			}
 			processo.updateEstado(PCB.Estado.ESPERANDO);
-
+		}
 		Operacao op = processo.codigo[processo.operacoesFeitas];
 		if(!( op instanceof OperacaoES))
 			return null;
@@ -154,14 +155,39 @@ public class SeuSO extends SO {
 	}
 
 	private PCB getPCBespera(int idDispositivo) {
-
 		gerateLists();
-
+		if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+			for(int idPEsperando: filaEsperando){
+				for( PCB processo: processos){
+					if(processo.idProcesso == idPEsperando) {
+						if(! (processo.codigo.length == processo.operacoesFeitas) && (processo.idProcesso != this.ciclo - 1)){
+							if((processo.estado != Estado.EXECUTANDO)) {
+								Operacao op =  processo.codigo[processo.operacoesFeitas];
+									if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+										return processo;
+							}
+							
+						}
+					}
+					
+				}
+			}
+			
+			return null;
+		}
 		for( PCB processo: processos){
-			if(! (processo.codigo.length == processo.operacoesFeitas)){
-				Operacao op =  processo.codigo[processo.operacoesFeitas];
-				if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
-					return processo;
+			if(! (processo.codigo.length == processo.operacoesFeitas) && (processo.idProcesso != this.ciclo - 1)){
+				if((processo.estado != Estado.EXECUTANDO)) {
+					if(this.escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+						Operacao op =  processo.codigo[processo.operacoesFeitas];
+						if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+							return processo;
+					}
+					Operacao op =  processo.codigo[processo.operacoesFeitas];
+					if(op instanceof OperacaoES && ((OperacaoES) op).idDispositivo == idDispositivo)
+						return processo;
+				}
+				
 			}
 		}
 		return null;
@@ -170,15 +196,14 @@ public class SeuSO extends SO {
 	@Override
 	protected Operacao proximaOperacaoCPU() {
 		PCB PCBatual = getPCBAtual();
-		if(PCBatual != null && PCBatual.operacoesFeitas  < (PCBatual.codigo.length )){
+		if((PCBatual != null) && (PCBatual.operacoesFeitas  < PCBatual.codigo.length) && !(PCBatual.estado.equals(Estado.NOVO))){
 			int pos = PCBatual.operacoesFeitas;
 			int local = processos.indexOf(PCBatual);
 			Operacao answer = PCBatual.codigo[pos];
-
 			if(answer instanceof OperacaoES){
 				for(PCB processo: processos){
 					if(processo.operacoesFeitas < processo.codigo.length
-							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES))){
+							&&(! (processo.codigo[processo.operacoesFeitas] instanceof OperacaoES) && !(processo.estado.equals(Estado.NOVO)))){
 						answer = processo.codigo[processo.operacoesFeitas];
 						processo.operacoesFeitas++;
 						processo.updateEstado(PCB.Estado.EXECUTANDO);
@@ -190,6 +215,12 @@ public class SeuSO extends SO {
 				return null;
 			}
 			if(! PCBatual.estado.equals(PCB.Estado.EXECUTANDO)){
+				if(PCBatual.estado.equals(PCB.Estado.ESPERANDO)) {
+					if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+						if(filaEsperando.contains(PCBatual.idProcesso))
+							filaEsperando.remove(filaEsperando.indexOf(PCBatual.idProcesso));
+					}
+				}
 				PCBatual.updateEstado(PCB.Estado.EXECUTANDO);
 				this.idProcessoAtual = PCBatual.idProcesso;
 			}
@@ -197,7 +228,6 @@ public class SeuSO extends SO {
 			PCBatual.ciclosExecutando ++;
 			PCBatual.operacoesFeitas++;
 			return answer;
-
 		} 
 		else
 			return null;
@@ -211,41 +241,100 @@ public class SeuSO extends SO {
 		gerateLists();
 		boolean temNovosTerminados = false;
 		List<PCB> terminadosList = new ArrayList<>();
-
 		for(PCB pcb: processos){
-
-
+			System.out.println("\nProcesso: " + pcb.idProcesso);
 			if(pcb.operacoesFeitas == pcb.codigo.length) {
 				pcb.updateEstado(PCB.Estado.TERMINADO);
 				temNovosTerminados = true;
 				terminadosList.add(pcb);
 			}else{
+				if(pcb.estado.equals(PCB.Estado.NOVO) && (pcb.idProcesso == this.ciclo - 1)){
+					continue;
+				}
 				Operacao op = pcb.codigo[pcb.operacoesFeitas];
 				if(op instanceof OperacaoES) {
-					if(((OperacaoES) op).ciclos == 0 ) {
-						pcb.updateEstado(PCB.Estado.EXECUTANDO);
+					if(((OperacaoES) op).ciclos == 0) { 
+						if(cpuExecutando()) {
+							if((pcb.operacoesFeitas + 1) < pcb.codigo.length && !(pcb.codigo[pcb.operacoesFeitas + 1] instanceof OperacaoES)) {
+								
+								pcb.updateEstado(PCB.Estado.PRONTO);
+								if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+									filaProntos.add(pcb.idProcesso);
+									filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+								} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST && pcb instanceof PCB_SJF) {
+									processosProntos.add(pcb.idProcesso);
+								}
+							}
+						} else if(filaEsperando.size() > 0 && pcb.idProcesso == filaEsperando.get(0)){
+							pcb.updateEstado(PCB.Estado.EXECUTANDO);
+							System.out.println("Executando");
+							if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+								filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+							} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
+								pcb.contadorBurst++;
+							}
+						} else {
+							pcb.updateEstado(PCB.Estado.ESPERANDO);
+							if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+								if(!filaEsperando.contains(pcb.idProcesso))
+									filaEsperando.add(pcb.idProcesso);
+							} 
+							processosEmEspera.add(pcb.idProcesso);
+						}
 						pcb.operacoesFeitas += 1;
-					}else if(pcb.codigo == processos.get(0).codigo){
+					} else {
+						if(pcb.estado == PCB.Estado.EXECUTANDO) {
+							this.idProcessoAtual = -1;
+							if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
+								pcb.mediaExponencial();
+								pcb.contadorBurst = 0;
+							}
+						}
 						pcb.updateEstado(PCB.Estado.ESPERANDO);
 						processosEmEspera.add(pcb.idProcesso);
+						if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+							if(!filaEsperando.contains(pcb.idProcesso))
+								filaEsperando.add(pcb.idProcesso);
+							System.out.println("\n" + pcb.idProcesso);
+						}
 					}
-
 				}
 				else {
 					if(pcb.estado.equals(PCB.Estado.NOVO)){
 						pcb.updateEstado(PCB.Estado.PRONTO);
-					}if(pcb.estado.equals(PCB.Estado.PRONTO)){
-						if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso) {
+						if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED)
+							filaProntos.add(pcb.idProcesso);
+					}
+					if(pcb.estado.equals(PCB.Estado.PRONTO)){
+						if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+							if(!cpuExecutando() && filaProntos.get(0) == pcb.idProcesso) {
+								pcb.updateEstado(PCB.Estado.EXECUTANDO);
+								filaProntos.remove(0);	
+							}
+						} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
+							pcb.contadorBurst = 0;
+							if(!cpuExecutando() && processosProntos.get(0) == pcb.idProcesso) {
+								pcb.updateEstado(PCB.Estado.EXECUTANDO);
+								processosProntos.remove(0);
+								pcb.contadorBurst++;
+							}
+						} else if(!cpuExecutando() && processos.get(0).idProcesso == pcb.idProcesso ) {
 							pcb.updateEstado(PCB.Estado.EXECUTANDO);
 						}
-					}else if(pcb.estado.equals(PCB.Estado.EXECUTANDO))
-						if(processos.get(0).idProcesso != pcb.idProcesso)
+					} else if(pcb.estado.equals(PCB.Estado.EXECUTANDO)){
+						if(this.escalonador.equals(Escalonador.FIRST_COME_FIRST_SERVED)) {
+							continue;
+						} else if(this.escalonador.equals(Escalonador.SHORTEST_JOB_FIRST)) {
+							continue;
+						} else if(processos.get(0).idProcesso != pcb.idProcesso){
 							trocaContexto(pcb, processos.get(0));
+						}
+					}
+						
+							
 				}
 
-
 			}
-
 			processos.set(processos.indexOf(pcb), pcb);
 		}
 		if(temNovosTerminados){
@@ -260,13 +349,20 @@ public class SeuSO extends SO {
 			}
 		}
 		gerateLists();
+		imprimirFila(this.filaProntos, "prontos");
+		imprimirFila(this.filaEsperando, "esperando");
 
 	}
 
+	private void imprimirFila(List<Integer> fila, String nome) {
+		System.out.println("Imprimindo fila" + fila.toString() + nome);
+	}
+
 	private boolean cpuExecutando() {
-		PCB PCBAtual = getPCBAtual();
-		assert PCBAtual != null;
-		return PCBAtual.idProcesso == this.idProcessoAtual;
+		// PCB PCBAtual = getPCBAtual();
+		// assert PCBAtual != null;
+		// return PCBAtual.idProcesso == this.idProcessoAtual;
+		return this.idProcessoAtual > -1;
 	}
 
 	@Override
@@ -344,7 +440,8 @@ public class SeuSO extends SO {
 
 		processosProntos = new LinkedList<>();
 		processosEmEspera = new LinkedList<>();
-
+		idProcessoNovo = -1;
+		idProcessoAtual = -1;
 		for(PCB e: processos){
 			if(e.estado.equals(PCB.Estado.NOVO))
 				idProcessoNovo = e.idProcesso;
@@ -355,9 +452,25 @@ public class SeuSO extends SO {
 			if(e.estado.equals(PCB.Estado.ESPERANDO))
 				processosEmEspera.add(e.idProcesso);
 		}
+
 	}
 
 	private PCB getPCBAtual(){
+		if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
+			for(PCB processo: processos) {
+				if(processo.idProcesso == idProcessoAtual) {
+					return processo;
+				}				
+			}
+		} 
+		for(PCB processo: processos) {
+			if(filaProntos.size() > 0){
+				if (processo.idProcesso == filaProntos.get(0)){
+					filaProntos.remove(0);
+					return processo;
+				}
+			}
+		}
 		return processos.size() != 0 ?  processos.get(0): null;
 	}
 
