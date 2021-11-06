@@ -22,4 +22,8 @@ public class PCB_SJF extends PCB{
 
         return answer != 0 ? answer : o1.cicloEntrada - o2.cicloEntrada;
     }
+
+    public void mediaExponencial() {
+        this.proxChuteBurstCPU = (proxChuteBurstCPU + contadorBurst)/2;
+    }
 }

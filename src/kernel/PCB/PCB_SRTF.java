@@ -22,4 +22,6 @@ public class PCB_SRTF extends PCB{
 
         return answer != 0 ? answer : o1.cicloEntrada - o2.cicloEntrada;
     }
+
+
 }
