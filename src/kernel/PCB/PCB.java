@@ -16,10 +16,12 @@ public abstract class PCB implements Comparator<PCB> {
 	public int contadorDePrograma;
 	public Operacao[] codigo;
 	public int proximoChute;
-	public static int processosfeitos = 0;
+	public static int processosfeitos;
 	public int operacoesFeitas;
 	public int ciclosExecutando;
 	public int cicloEntrada;
+	public int contadorBurst;
+	public int proxChuteBurstCPU;
 
 	private LocalDateTime tempoEsperaInicio;
 	public int tempoEspera;
@@ -40,6 +42,8 @@ public abstract class PCB implements Comparator<PCB> {
 		this.tempoRetorno = 0;
 		this.ciclosExecutando = 0;
 		this.cicloEntrada = cicloEntrada;
+		this.contadorBurst = 0;
+		this.proxChuteBurstCPU = 0;
 		processosfeitos++;
 	}
 
@@ -62,7 +66,9 @@ public abstract class PCB implements Comparator<PCB> {
 
 		this.estado = estado;
 	}
-
+	public void mediaExponencial() {
+        this.proxChuteBurstCPU = (proxChuteBurstCPU + contadorBurst)/2;
+    }
 	public  int getTempoResposta(){
 		if(operacoesFeitas > 0)
 			return (tempoRetorno - tempoEspera)/operacoesFeitas;
