@@ -67,7 +67,11 @@ public abstract class PCB implements Comparator<PCB> {
 		this.estado = estado;
 	}
 	public void mediaExponencial() {
+		System.out.println("\nContador Burst" + contadorBurst);
+		System.out.println("\nProx Chut Burst Cpu" + proxChuteBurstCPU);
         this.proxChuteBurstCPU = (proxChuteBurstCPU + contadorBurst)/2;
+		System.out.println("\nProx Chut Burst Cpu" + proxChuteBurstCPU);
+		contadorBurst = 0;
     }
 	public  int getTempoResposta(){
 		if(operacoesFeitas > 0)
