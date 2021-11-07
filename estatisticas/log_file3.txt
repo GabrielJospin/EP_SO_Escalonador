@@ -1,0 +1,500 @@
+PROXIMO TESTE 
+
+ Teste 1: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 6000
+Tempo de resposta médio: 222
+Tempo de espera médio: 2500
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 2200
+Tempo de resposta médio: 148
+Tempo de espera médio: 300
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 2900
+Tempo de resposta médio: 96
+Tempo de espera médio: 1600
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 3000
+Tempo de resposta médio: 90
+Tempo de espera médio: 2000
+Trocas de contexto: 1
+======================================
+PROXIMO TESTE 
+
+ Teste 2: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 5400
+Tempo de resposta médio: 244
+Tempo de espera médio: 2500
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1300
+Tempo de resposta médio: 111
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1800
+Tempo de resposta médio: 105
+Tempo de espera médio: 600
+Trocas de contexto: 1
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 2100
+Tempo de resposta médio: 139
+Tempo de espera médio: 500
+Trocas de contexto: 1
+======================================
+PROXIMO TESTE 
+
+ Teste 3: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1100
+Tempo de resposta médio: 192
+Tempo de espera médio: 100
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1200
+Tempo de resposta médio: 227
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 185
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 200
+Tempo de resposta médio: 24
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 6: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 900
+Tempo de resposta médio: 110
+Tempo de espera médio: 200
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 300
+Tempo de resposta médio: 29
+Tempo de espera médio: 100
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 800
+Tempo de resposta médio: 86
+Tempo de espera médio: 200
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 7: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1153
+Tempo de resposta médio: 45
+Tempo de espera médio: 538
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 461
+Tempo de resposta médio: 28
+Tempo de espera médio: 76
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1230
+Tempo de resposta médio: 61
+Tempo de espera médio: 538
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 1307
+Tempo de resposta médio: 50
+Tempo de espera médio: 692
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 9: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1100
+Tempo de resposta médio: 27
+Tempo de espera médio: 700
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 600
+Tempo de resposta médio: 43
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 500
+Tempo de resposta médio: 7
+Tempo de espera médio: 400
+Trocas de contexto: 1
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 800
+Tempo de resposta médio: 25
+Tempo de espera médio: 400
+Trocas de contexto: 1
+======================================
+PROXIMO TESTE 
+
+ Teste 10: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1300
+Tempo de resposta médio: 160
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 800
+Tempo de resposta médio: 99
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 400
+Tempo de resposta médio: 18
+Tempo de espera médio: 100
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 800
+Tempo de resposta médio: 102
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 12: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 900
+Tempo de resposta médio: 55
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1100
+Tempo de resposta médio: 67
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1300
+Tempo de resposta médio: 41
+Tempo de espera médio: 600
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 1200
+Tempo de resposta médio: 63
+Tempo de espera médio: 200
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 13: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 700
+Tempo de resposta médio: 47
+Tempo de espera médio: 200
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 200
+Tempo de resposta médio: 19
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 48
+Tempo de espera médio: 500
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 700
+Tempo de resposta médio: 18
+Tempo de espera médio: 500
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 14: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 545
+Tempo de resposta médio: 34
+Tempo de espera médio: 181
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1090
+Tempo de resposta médio: 152
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 545
+Tempo de resposta médio: 65
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 16: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 400
+Tempo de resposta médio: 39
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 100
+Tempo de resposta médio: 11
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 17: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 140
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 1083
+Tempo de resposta médio: 140
+Tempo de espera médio: 83
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 18: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 300
+Tempo de resposta médio: 20
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 22
+Tempo de espera médio: 700
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 500
+Tempo de resposta médio: 0
+Tempo de espera médio: 500
+Trocas de contexto: 0
+======================================
+PROXIMO TESTE 
+
+ Teste 19: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 34
+Tempo de espera médio: 200
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 28
+Tempo de espera médio: 300
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 8
+Tempo de espera médio: 800
+Trocas de contexto: 1
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 0
+Tempo de resposta médio: 0
+Tempo de espera médio: 0
+Trocas de contexto: 2
+======================================
+PROXIMO TESTE 
+
+ Teste 23: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 42
+Tempo de espera médio: 266
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 666
+Tempo de resposta médio: 34
+Tempo de espera médio: 0
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 600
+Tempo de resposta médio: 16
+Tempo de espera médio: 266
+Trocas de contexto: 1
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 533
+Tempo de resposta médio: 20
+Tempo de espera médio: 200
+Trocas de contexto: 1
+======================================
+PROXIMO TESTE 
+
+ Teste 24: 
+Executando escalonator FIRST_COME_FIRST_SERVED
+============ Estatísticas ============
+Tempo de retorno médio: 900
+Tempo de resposta médio: 62
+Tempo de espera médio: 100
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_JOB_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 48
+Tempo de espera médio: 500
+Trocas de contexto: 0
+======================================
+Executando escalonator SHORTEST_REMANING_TIME_FIRST
+============ Estatísticas ============
+Tempo de retorno médio: 1000
+Tempo de resposta médio: 41
+Tempo de espera médio: 600
+Trocas de contexto: 0
+======================================
+Executando escalonator ROUND_ROBIN_QUANTUM_5
+============ Estatísticas ============
+Tempo de retorno médio: 1100
+Tempo de resposta médio: 31
+Tempo de espera médio: 600
+Trocas de contexto: 1
+======================================
+PROXIMO TESTE 
+
+ Teste 25: 
+Executando escalonator FIRST_COME_FIRST_SERVED
