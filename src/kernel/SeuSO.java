@@ -103,6 +103,7 @@ public class SeuSO extends SO {
 
 	@Override
 	protected void trocaContexto(PCB pcbAtual, PCB pcbProximo) {
+		trocasDeProcesso++;
 		int idAtual = processos.indexOf(pcbAtual);
 		int idProximo = processos.indexOf(pcbProximo);
 		if(pcbProximo.estado.equals(PCB.Estado.ESPERANDO)){
@@ -124,7 +125,7 @@ public class SeuSO extends SO {
 		processos.set(idAtual, pcbAtual);
 		processos.set(idProximo, pcbProximo);
 
-		trocasDeProcesso++;
+
 	}
 
 	@Override
@@ -134,8 +135,8 @@ public class SeuSO extends SO {
 			return null;
 
 		PCB processo = getPCBespera(idDispositivo);
-		if(processo != null)
-			System.out.println("Prox op e/s" + processo.idProcesso);
+		//if(processo != null)
+			//System.out.println("Prox op e/s" + processo.idProcesso);
 		if(processo == null || processo.codigo.length == processo.operacoesFeitas)
 			return null;
 		if(!processo.estado.equals(PCB.Estado.ESPERANDO)) {
@@ -222,7 +223,7 @@ public class SeuSO extends SO {
 				if(PCBatual.estado.equals(PCB.Estado.ESPERANDO)) {
 					if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
 						if(filaEsperando.contains(PCBatual.idProcesso))
-							filaEsperando.remove(filaEsperando.indexOf(PCBatual.idProcesso));
+							filaEsperando.remove((Integer) PCBatual.idProcesso);
 					}
 				}
 				PCBatual.updateEstado(PCB.Estado.EXECUTANDO);
@@ -249,7 +250,7 @@ public class SeuSO extends SO {
 		boolean temNovosTerminados = false;
 		List<PCB> terminadosList = new ArrayList<>();
 		for(PCB pcb: processos){
-			System.out.println("\nProcesso: " + pcb.idProcesso);
+			//System.out.println("\nProcesso: " + pcb.idProcesso);
 			if(pcb.operacoesFeitas == pcb.codigo.length) {
 				pcb.updateEstado(PCB.Estado.TERMINADO);
 				temNovosTerminados = true;
@@ -267,15 +268,15 @@ public class SeuSO extends SO {
 								pcb.updateEstado(PCB.Estado.PRONTO);
 								if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
 									filaProntos.add(pcb.idProcesso);
-									filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+									filaEsperando.remove((Integer) pcb.idProcesso);
 								}
 								processosProntos.add(pcb.idProcesso);
 							}
 						} else if(filaEsperando.size() > 0 && pcb.idProcesso == filaEsperando.get(0)){
 							pcb.updateEstado(PCB.Estado.EXECUTANDO);
-							System.out.println("Executando");
+							//System.out.println("Executando");
 							if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
-								filaEsperando.remove(filaEsperando.indexOf(pcb.idProcesso));
+								filaEsperando.remove((Integer) pcb.idProcesso);
 							} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
 								((PCB_SJF)pcb).contadorBurst++;
 							}
@@ -293,7 +294,7 @@ public class SeuSO extends SO {
 						if(pcb.estado == PCB.Estado.EXECUTANDO) {
 							this.idProcessoAtual = -1;
 							if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
-								((PCB_SJF)pcb).mediaExponencial();
+								pcb.mediaExponencial();
 								((PCB_SJF)pcb).contadorBurst = 0;
 							}
 						}
@@ -302,7 +303,7 @@ public class SeuSO extends SO {
 						if(this.escalonador == Escalonador.FIRST_COME_FIRST_SERVED) {
 							if(!filaEsperando.contains(pcb.idProcesso))
 								filaEsperando.add(pcb.idProcesso);
-							System.out.println("\n" + pcb.idProcesso);
+							//System.out.println("\n" + pcb.idProcesso);
 						}
 					}
 				}
@@ -320,7 +321,8 @@ public class SeuSO extends SO {
 							}
 						} else if(this.escalonador == Escalonador.SHORTEST_JOB_FIRST) {
 							((PCB_SJF)pcb).contadorBurst = 0;
-							if(!cpuExecutando() && processosProntos.get(0) == pcb.idProcesso) {
+							if(!cpuExecutando() && processosProntos.size() > 0
+							&& processosProntos.get(0) == pcb.idProcesso) {
 								pcb.updateEstado(PCB.Estado.EXECUTANDO);
 								processosProntos.remove(0);
 								((PCB_SJF)pcb).contadorBurst++;
@@ -375,14 +377,14 @@ public class SeuSO extends SO {
 			}
 		}
 		gerateLists();
-		System.out.println("Processo atual na CPU" + idProcessoAtual);
+		//System.out.println("Processo atual na CPU" + idProcessoAtual);
 		imprimirFila(this.filaProntos, "prontos");
 		imprimirFila(this.filaEsperando, "esperando");
 
 	}
 
 	private void imprimirFila(List<Integer> fila, String nome) {
-		System.out.println("Imprimindo fila" + fila.toString() + nome);
+		//System.out.println("Imprimindo fila" + fila.toString() + nome);
 	}
 
 	private boolean cpuExecutando() {
@@ -455,7 +457,7 @@ public class SeuSO extends SO {
 
 	@Override
 	protected int trocasContexto() {
-		return this.trocasDeProcesso/quantidadeDeProcessos;
+		return this.trocasDeProcesso;
 	}
 
 	@Override
